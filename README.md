@@ -1,0 +1,2 @@
+# storex
+Centralized Store Management
