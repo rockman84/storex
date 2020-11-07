@@ -1,0 +1,14 @@
+{
+  "name": "sky",
+  "version": "1.0.0",
+  "dependencies": {
+  },
+  "keywords": [
+    "json",
+    "json5",
+    "es5",
+    "es2015",
+    "ecmascript"
+  ],
+  "sideEffects": false
+}
