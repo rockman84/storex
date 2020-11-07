@@ -1,5 +1,5 @@
-import BaseObject from "@/sky/base/BaseObject";
-import Model from "@/sky/store/Model";
+import BaseObject from "@/storex/base/BaseObject";
+import Model from "@/storex/store/Model";
 
 
 /**

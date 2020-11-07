@@ -1,8 +1,8 @@
 /**
  * @property {string} firstName
  */
-import BaseObject from "@/sky/base/BaseObject";
-import Collection from "@/sky/store/Collection";
+import BaseObject from "@/storex/base/BaseObject";
+import Collection from "@/storex/store/Collection";
 
 export default class Model extends BaseObject
 {
