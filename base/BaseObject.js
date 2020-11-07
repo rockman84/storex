@@ -107,6 +107,16 @@ export default class BaseObject
     return this._oldAttributes[key];
   }
 
+  get oldAttribute()
+  {
+    return this._oldAttributes;
+  }
+
+  get isDirtyAttribute()
+  {
+    return Object.entries(this._oldAttributes).length != 0;
+  }
+
   /**
    * clear old attributes
    * @private

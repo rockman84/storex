@@ -75,6 +75,11 @@ export default class Collection extends BaseObject
     this._data.slice(1, 1);
   }
 
+  findById(id)
+  {
+    return this._data.find((data) => data.id == id);
+  }
+
   sync()
   {
 
