@@ -13,14 +13,27 @@ export default class Model extends BaseObject
    */
   _relations = {};
 
+  /**
+   * fetch raw data
+   * @type {{*}}
+   * @private
+   */
+  _rawData = null;
+
+  _errors = [];
+
   constructor(args) {
 
     super(args);
+    /**
+     * check is new record
+     * @type {boolean}
+     */
     Model.prototype.isNewRecord = true;
     Model.prototype.extraParams = {};
     Model.prototype.primaryKeyAttribute = 'id';
-    Model.prototype._errors = [];
     Model.prototype.collection = null;
+    Model.prototype.collectionClass = Collection;
   }
 
   /**
@@ -32,12 +45,11 @@ export default class Model extends BaseObject
    */
   hasMany(className, link, name) {
     if (typeof this._relations[name] == 'undefined') {
-      this._relations[name] = new Collection({
+      this._relations[name] = new this.collectionClass({
         model: className,
         link: link,
       });
     }
-    console.log('use cache');
     return this._relations[name];
   }
 
@@ -49,10 +61,35 @@ export default class Model extends BaseObject
    */
   hasOne(className, link)
   {
+    if (!className instanceof Model) {
+      throw `className must instance of Model`;
+    }
     if (typeof this._relations[name] == 'undefined') {
       this._relations[name] = className.find(link);
     }
     return this._relations[name]
+  }
+
+  /**
+   * get primary key value
+   * @returns {*}
+   */
+  get primaryKey()
+  {
+    if (typeof this[this.primaryKeyAttribute] == 'undefined') {
+      throw `can't find Id key in attributes`;
+    }
+    return this[this.primaryKeyAttribute];
+  }
+
+  get rawData()
+  {
+    return this._rawData;
+  }
+
+  set rawData(data)
+  {
+    this._rawData = data;
   }
 
   /**
@@ -108,7 +145,23 @@ export default class Model extends BaseObject
     return true;
   }
 
+  load(params = {})
+  {
+    let data = this._fetch(params);
+    this._rawData = data;
+    this.setAttributes(data);
+  }
+
+  static loadAll()
+  {
+
+  }
+
   afterSave() {
+    return true;
+  }
+
+  beforeSave(insert, oldAttributes) {
     return true;
   }
 
@@ -116,48 +169,42 @@ export default class Model extends BaseObject
     if (this.validate(validate) && this.beforeSave()) {
       let saving = false;
       if (this.isNewRecord) {
-        saving = this.insert();
+        saving = this._insert();
       } else {
-        saving = this.update();
+        saving = this._update();
       }
+      console.log(saving);
       if (saving) {
         this.isNewRecord = false;
         this.afterSave(this.isNewRecord, this.getOldAttributes());
         this._clearOldAttribute();
         return true;
       }
-      return true;
     }
     return false;
   }
 
-  beforeSave(insert, oldAttributes) {
+  _fetch(params = {})
+  {
+    return localStorage.getItem(this.id);
+  }
+
+  _insert()
+  {
+    localStorage.setItem(this[this.primaryKeyAttribute], this.getAttributes());
     return true;
   }
 
-  static find()
+  _update()
   {
-    throw `find not supported`;
-  }
-
-  beforeFind()
-  {
+    localStorage.setItem(this.id, this.getAttributes());
     return true;
   }
 
-  afterFind()
+  _delete()
   {
+    localStorage.removeItem(this.id);
     return true;
-  }
-
-  insert()
-  {
-    throw `insert not supported`;
-  }
-
-  update()
-  {
-    throw `insert not supported`;
   }
 
   delete()
@@ -165,8 +212,9 @@ export default class Model extends BaseObject
     if (!this.beforeDelete() || this.isNewRecord) {
       return false;
     }
+    let result = this._delete();
     this.afterDelete();
-    return true;
+    return result;
   }
 
   afterDelete()

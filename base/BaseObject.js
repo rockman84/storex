@@ -15,7 +15,6 @@ export default class BaseObject
   _oldAttributes = {};
 
   constructor(args = {}) {
-
     // auto getter and setter attributes
     let attributes = this.attributes();
     let properties = {};
@@ -42,6 +41,11 @@ export default class BaseObject
   init()
   {
     return true;
+  }
+
+  get className()
+  {
+    return this.constructor.name;
   }
 
   /**
