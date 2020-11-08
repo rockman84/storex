@@ -3,9 +3,19 @@
  */
 import BaseObject from "@/storex/base/BaseObject";
 import Collection from "@/storex/store/Collection";
+import Event from "@/storex/base/Event";
 
 export default class Model extends BaseObject
 {
+  static EVENT_BEFORE_SAVE = 'beforeSave';
+  static EVENT_AFTER_SAVE = 'afterSave';
+  static EVENT_BEFORE_DELETE = 'beforeDelete';
+  static EVENT_AFTER_DELETE = 'afterDelete';
+  static EVENT_BEFORE_INSERT = 'beforeInsert';
+  static EVENT_AFTER_INSERT = 'afterInsert';
+  static EVENT_BEFORE_VALIDATE = 'beforeValidate';
+  static EVENT_AFTER_VALIDATE = 'afterValidate';
+
   /**
    * relations model
    * @type {{}}
@@ -20,6 +30,11 @@ export default class Model extends BaseObject
    */
   _rawData = null;
 
+  /**
+   * errors storage
+   * @type {[]}
+   * @private
+   */
   _errors = [];
 
   constructor(args) {
@@ -82,11 +97,19 @@ export default class Model extends BaseObject
     return this[this.primaryKeyAttribute];
   }
 
+  /**
+   * get raw data
+   * @returns {null}
+   */
   get rawData()
   {
     return this._rawData;
   }
 
+  /**
+   * set raw data
+   * @param data
+   */
   set rawData(data)
   {
     this._rawData = data;
@@ -157,26 +180,50 @@ export default class Model extends BaseObject
 
   }
 
-  afterSave() {
+  /**
+   * event trigger after save data
+   * @param insert
+   * @param oldAttributes
+   * @returns {boolean}
+   */
+  afterSave(insert, oldAttributes) {
+    const event = new Event(Model.EVENT_AFTER_SAVE, this, {
+      oldAttributes: oldAttributes,
+      insert: insert,
+    });
+    this.emit(event.name, event);
     return true;
   }
 
-  beforeSave(insert, oldAttributes) {
+  /**
+   * event trigger before save data
+   * @param insert
+   * @returns {boolean}
+   */
+  beforeSave(insert) {
+    const event = new Event(Model.EVENT_BEFORE_SAVE, this, {
+      insert: insert,
+    });
+    this.emit(event.name, event);
     return true;
   }
 
+  /**
+   * action save data
+   * @param validate
+   * @returns {boolean}
+   */
   save(validate = true) {
-    if (this.validate(validate) && this.beforeSave()) {
+    if (this.validate(validate) && this.beforeSave(this.isNewRecord)) {
       let saving = false;
       if (this.isNewRecord) {
         saving = this._insert();
       } else {
         saving = this._update();
       }
-      console.log(saving);
       if (saving) {
-        this.isNewRecord = false;
         this.afterSave(this.isNewRecord, this.getOldAttributes());
+        this.isNewRecord = false;
         this._clearOldAttribute();
         return true;
       }
@@ -217,13 +264,25 @@ export default class Model extends BaseObject
     return result;
   }
 
+  /**
+   * event trigger after delete data
+   * @returns {boolean}
+   */
   afterDelete()
   {
+    const event = new Event(Model.EVENT_AFTER_DELETE, this);
+    this.emit(event.name, this);
     return true;
   }
 
+  /**
+   * event trigger before delete data
+   * @returns {boolean}
+   */
   beforeDelete()
   {
+    const event = new Event(Model.EVENT_BEFORE_DELETE, this);
+    this.emit(event.name, this);
     return true;
   }
 }

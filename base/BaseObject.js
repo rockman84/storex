@@ -1,3 +1,8 @@
+import Event from "@/storex/base/Event";
+
+/**
+ * base object class
+ */
 export default class BaseObject
 {
   /**
@@ -13,6 +18,8 @@ export default class BaseObject
    * @private
    */
   _oldAttributes = {};
+
+  _listeners = {};
 
   constructor(args = {}) {
     // auto getter and setter attributes
@@ -36,6 +43,8 @@ export default class BaseObject
         console.log(args[key]);
       }
     }
+
+    this.init();
   }
 
   init()
@@ -43,6 +52,10 @@ export default class BaseObject
     return true;
   }
 
+  /**
+   * get class name
+   * @returns {String}
+   */
   get className()
   {
     return this.constructor.name;
@@ -139,6 +152,30 @@ export default class BaseObject
     this.setAttributes(this._oldAttributes);
     this._clearOldAttribute();
     return this;
+  }
+
+  get listeners()
+  {
+    return this._listeners;
+  }
+
+  addListeners(name, caller)
+  {
+    this._listeners[name] = [];
+    this._listeners[name].push(caller);
+  }
+
+  emit(eventName, event)
+  {
+    if (!event instanceof Event) {
+      throw `event must instance of Event`;
+    }
+    if (typeof this.listeners[eventName] === 'undefined') {
+      return null;
+    }
+    for (const key in this.listeners[eventName] ) {
+      this.listeners[eventName][key](event);
+    }
   }
 
   /**
