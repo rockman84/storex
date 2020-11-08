@@ -5,15 +5,21 @@ import Model from "@/storex/store/Model";
 /**
  * @property {Model} model
  * @property {integer} pageSize
+ * @property {Object} link
  */
 export default class Collection extends BaseObject
 {
+  static EVENT_BEFORE_SYNC = 'beforeSync';
+  static EVENT_AFTER_SYNC = 'afterSync';
+
   /**
    * data stores item collection
    * @type {[]}
    * @private
    */
   _data = [];
+
+  _rawData = null;
 
   constructor(arg) {
     super(arg);
@@ -56,6 +62,11 @@ export default class Collection extends BaseObject
     return this._data.length;
   }
 
+  remove(attribute, value)
+  {
+    this._data = this._data.filter(data => data[attribute] != value);
+  }
+
   /**
    * add item collection
    * @param item
@@ -63,10 +74,8 @@ export default class Collection extends BaseObject
   push(item) {
     if (item instanceof this.model) {
       item.collection = this;
-      console.log(this);
       return this._data.push(item);
     }
-    console.log(this);
     return false;
   }
 
@@ -77,11 +86,21 @@ export default class Collection extends BaseObject
 
   findById(id)
   {
-    return this._data.find((data) => data.id == id);
+    return this.findByAttribute('id', id);
+  }
+
+  findByAttribute(attr, value)
+  {
+    return this._data.find((data) => data[attr] == value);
   }
 
   sync()
   {
 
+  }
+
+  load(params)
+  {
+    this._data = this.model.load(params);
   }
 }

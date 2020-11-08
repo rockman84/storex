@@ -11,7 +11,6 @@ export default class Model extends BaseObject
   static EVENT_AFTER_SAVE = 'afterSave';
   static EVENT_BEFORE_DELETE = 'beforeDelete';
   static EVENT_AFTER_DELETE = 'afterDelete';
-  static EVENT_BEFORE_INSERT = 'beforeInsert';
   static EVENT_AFTER_INSERT = 'afterInsert';
   static EVENT_BEFORE_VALIDATE = 'beforeValidate';
   static EVENT_AFTER_VALIDATE = 'afterValidate';
@@ -160,11 +159,31 @@ export default class Model extends BaseObject
    * @param validate
    * @returns {boolean}
    */
-  validate(validate = true) {
-    if (!validate) {
-      return true;
-    }
-    this._errors = {};
+  validate() {
+    this.beforeValidate();
+    this.afterValidate();
+    return true;
+  }
+
+  /**
+   * event trigger before validate
+   * @returns {boolean}
+   */
+  beforeValidate()
+  {
+    const event = new Event(Model.EVENT_BEFORE_VALIDATE, this);
+    this.emit(event.name, event);
+    return true;
+  }
+
+  /**
+   * event trigger after validate
+   * @returns {boolean}
+   */
+  afterValidate()
+  {
+    const event = new Event(Model.EVENT_AFTER_VALIDATE, this);
+    this.emit(event.name, event);
     return true;
   }
 
@@ -214,7 +233,7 @@ export default class Model extends BaseObject
    * @returns {boolean}
    */
   save(validate = true) {
-    if (this.validate(validate) && this.beforeSave(this.isNewRecord)) {
+    if ((validate && this.validate()) && this.beforeSave(this.isNewRecord)) {
       let saving = false;
       if (this.isNewRecord) {
         saving = this._insert();
@@ -233,24 +252,24 @@ export default class Model extends BaseObject
 
   _fetch(params = {})
   {
-    return localStorage.getItem(this.id);
+    return localStorage.getItem(this.primaryKey);
   }
 
   _insert()
   {
-    localStorage.setItem(this[this.primaryKeyAttribute], this.getAttributes());
+    localStorage.setItem(this.primaryKey, this.getAttributes());
     return true;
   }
 
   _update()
   {
-    localStorage.setItem(this.id, this.getAttributes());
+    localStorage.setItem(this.primaryKey, this.getAttributes());
     return true;
   }
 
   _delete()
   {
-    localStorage.removeItem(this.id);
+    localStorage.removeItem(this.primaryKey);
     return true;
   }
 
@@ -259,8 +278,13 @@ export default class Model extends BaseObject
     if (!this.beforeDelete() || this.isNewRecord) {
       return false;
     }
-    let result = this._delete();
-    this.afterDelete();
+    const result = this._delete();
+    if (result) {
+      if (this.collection instanceof Collection) {
+        this.collection.remove(this.primaryKeyAttribute, this.primaryKey);
+      }
+      this.afterDelete();
+    }
     return result;
   }
 

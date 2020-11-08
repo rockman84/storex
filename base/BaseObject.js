@@ -5,6 +5,7 @@ import Event from "@/storex/base/Event";
  */
 export default class BaseObject
 {
+  static EVENT_RESET_ATTRIBUTE = 'resetAttribute';
   /**
    * attributes
    * @type {{}}
@@ -149,22 +150,47 @@ export default class BaseObject
    */
   reset()
   {
+    const event = new Event({
+      name: BaseObject.EVENT_RESET_ATTRIBUTE,
+      target: this,
+      params: {
+        dirtyAttribute: this.getAttributes(),
+      }
+    });
+    this.emit(event.name, event);
     this.setAttributes(this._oldAttributes);
     this._clearOldAttribute();
     return this;
   }
 
+  /**
+   *
+   * @returns {{}}
+   */
   get listeners()
   {
     return this._listeners;
   }
 
+  /**
+   * add new listener event
+   * @param name
+   * @param caller
+   */
   addListeners(name, caller)
   {
-    this._listeners[name] = [];
+    if (typeof this._listeners[name] === 'undefined') {
+      this._listeners[name] = [];
+    }
     this._listeners[name].push(caller);
   }
 
+  /**
+   * trigger listener by event name
+   * @param eventName
+   * @param event
+   * @returns {null}
+   */
   emit(eventName, event)
   {
     if (!event instanceof Event) {
