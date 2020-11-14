@@ -1,9 +1,9 @@
 /**
  * @property {string} firstName
  */
-import BaseObject from "@/storex/base/BaseObject";
-import Collection from "@/storex/store/Collection";
-import Event from "@/storex/base/Event";
+import BaseObject from "../base/BaseObject";
+import Collection from "./Collection";
+import Event from "../base/Event";
 
 export default class Model extends BaseObject
 {

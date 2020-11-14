@@ -1,4 +1,4 @@
-import BaseObject from "@/storex/base/BaseObject";
+import BaseObject from "../base/BaseObject";
 
 export default class Validator extends BaseObject
 {

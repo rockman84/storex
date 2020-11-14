@@ -1,4 +1,4 @@
-import Model from "@/storex/store/Model";
+import Model from "./Model";
 import axios from "axios";
 
 export default class AxiosModel extends Model

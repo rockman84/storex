@@ -1,5 +1,5 @@
-import BaseObject from "@/storex/base/BaseObject";
-import Model from "@/storex/store/Model";
+import BaseObject from "../base/BaseObject";
+import Model from "./Model";
 
 
 /**

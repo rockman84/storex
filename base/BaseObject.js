@@ -1,4 +1,4 @@
-import Event from "@/storex/base/Event";
+import Event from "./Event";
 
 /**
  * base object class
