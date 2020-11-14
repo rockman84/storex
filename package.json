@@ -1,14 +1,22 @@
 {
-  "name": "sky",
+  "name": "@sky/sky-storex",
   "version": "1.0.0",
-  "dependencies": {
+  "author": "Hansen Wong",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rockman84/storex.git"
   },
-  "keywords": [
-    "json",
-    "json5",
-    "es5",
-    "es2015",
-    "ecmascript"
-  ],
-  "sideEffects": false
+  "homepage": "https://github.com/rockman84/storex/blob/main/README.md",
+  "license": "GPL-3.0-or-later",
+  "dependencies": {},
+  "keywords": [],
+  "sideEffects": false,
+  "description": "Centralized Store Management",
+  "bugs": {
+    "url": "https://github.com/rockman84/storex/issues"
+  },
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
 }
