@@ -232,13 +232,13 @@ export default class Model extends BaseObject
    * @param validate
    * @returns {boolean}
    */
-  save(validate = true) {
+  save(validate = true, attributes = null) {
     if ((validate && this.validate()) && this.beforeSave(this.isNewRecord)) {
       let saving = false;
       if (this.isNewRecord) {
-        saving = this._insert();
+        saving = this._insert(this.getAttributes(attributes));
       } else {
-        saving = this._update();
+        saving = this._update(this.getAttributes(attributes));
       }
       if (saving) {
         this.afterSave(this.isNewRecord, this.getOldAttributes());
@@ -255,15 +255,15 @@ export default class Model extends BaseObject
     return localStorage.getItem(this.primaryKey);
   }
 
-  _insert()
+  _insert(attributes = null)
   {
-    localStorage.setItem(this.primaryKey, this.getAttributes());
+    localStorage.setItem(this.primaryKey, this.getAttributes(attributes));
     return true;
   }
 
-  _update()
+  _update(attributes = null)
   {
-    localStorage.setItem(this.primaryKey, this.getAttributes());
+    localStorage.setItem(this.primaryKey, this.getAttributes(attributes));
     return true;
   }
 

@@ -73,14 +73,33 @@ export default class BaseObject
 
   /**
    * get all attributes
-   * @param key
-   * @returns {{}|boolean|*}
+   * @param only
+   * @returns {{}|null|*}
    */
-  getAttributes(key = null)
+  getAttributes(only = null)
   {
-    if (key === null) {
+    if (only === null) {
       return this._attributes;
-    } else if (typeof this._oldAttributes[key] == 'undefined') {
+    } else if (Array.isArray(only)) {
+      let result = {};
+      only.forEach((key) => {
+        if (typeof this._attributes[key] != 'undefined') {
+          result[key] = this._attributes[key];
+        }
+      });
+      return result;
+    }
+    return null;
+  }
+
+  /**
+   * get attribute value
+   * @param key
+   * @returns {boolean|*}
+   */
+  getAttribute(key)
+  {
+    if (typeof this._attributes[key] === 'undefined') {
       return false;
     }
     return this._attributes[key];
