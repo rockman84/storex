@@ -220,6 +220,7 @@ export default class Model extends BaseObject
       return false;
     }
     const me = this;
+    this._errors = {};
     this.validators.forEach((validator) => {
       // skip validate when attribute has error
       if (this.getErrorMessage(validator.attribute)) {

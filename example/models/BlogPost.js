@@ -25,11 +25,9 @@ export default class BlogPost extends Model
     return {
       id: ['required', 'number'],
       title: [
-        {type: 'default', value: function (model) {
-          return 'Default Value function';
-        }},
+
         'required',
-        'string',
+        'function',
         ['customValidation', {foo: 'bar'}],
       ],
       status: ['number'],
@@ -39,8 +37,6 @@ export default class BlogPost extends Model
 
   customValidation(attribute, params)
   {
-    if (this.title) {
-      this.setError(attribute, 'Custom Error');
-    }
+
   }
 }

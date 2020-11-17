@@ -1,6 +1,7 @@
 import Validator from "./Validator";
 
 /**
+ * Build-in Basic Validator
  * type:
  * - string
  * - number

@@ -2,6 +2,8 @@ import BaseObject from "../base/BaseObject";
 import Model from "../store/Model";
 
 /**
+ * Base Validator Class
+ *
  * @property {Validator|string} type
  * @property {string} attribute
  * @property {Model} context
@@ -10,14 +12,16 @@ import Model from "../store/Model";
  */
 export default class Validator extends BaseObject
 {
-  constructor(args) {
+  constructor(args)
+  {
     super(args);
     if (!this.context instanceof Model) {
       throw `context must instance of Model`;
     }
   }
 
-  attributes() {
+  attributes()
+  {
     return {
       type: null,
       attribute: null,
@@ -44,14 +48,16 @@ export default class Validator extends BaseObject
     }
   }
 
-  static isEmpty(value) {
+  static isEmpty(value)
+  {
     if (typeof value === 'number' || typeof value === 'boolean') {
       return false;
     }
     return value == '' || value === null;
   }
 
-  static typeof(type, value) {
+  static typeof(type, value)
+  {
     return typeof value === type;
   }
 
