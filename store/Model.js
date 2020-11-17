@@ -4,7 +4,8 @@
 import BaseObject from "../base/BaseObject";
 import Collection from "./Collection";
 import Event from "../base/Event";
-import Validator from "@/components/storex/validator/Validator";
+import Validator from "../validator/Validator";
+import BuildValidator from "../validator/BuildValidator";
 
 export default class Model extends BaseObject
 {
@@ -35,14 +36,14 @@ export default class Model extends BaseObject
    * @type {[]}
    * @private
    */
-  _errors = [];
+  _errors = {};
 
   /**
    * attributes validator class
    * @type Validator[]
    * @private
    */
-  _validators;
+  _validators = [];
 
   constructor(args) {
 
@@ -149,7 +150,7 @@ export default class Model extends BaseObject
   getErrorMessage(key)
   {
     if (typeof this._errors[key] === 'undefined') {
-      return null;
+      return '';
     }
     return this._errors[key];
   }
@@ -164,7 +165,7 @@ export default class Model extends BaseObject
    *   name: [
    *     {type: 'string', min: 4, max: 30},
    *     {type: CustomValidationClass, foo: 'any', bar: 'any'},
-   *     'customValidationMethod',
+   *     ['customValidationMethod', {foo: 'any', bar: 'any'}],
    *   ]
    * };
    * ```
@@ -181,22 +182,30 @@ export default class Model extends BaseObject
    * @returns {boolean}
    */
   validate(attributes = null) {
-    this.beforeValidate();
-    this.afterValidate();
+    if (!this.beforeValidate()) {
+      return false;
+    }
     const me = this;
     this.validators.forEach((validator) => {
+      // skip validate when attribute has error
+      if (this.getErrorMessage(validator.attribute)) {
+        return;
+      }
       if (validator instanceof Validator) {
+        // run validation object
         validator.validate();
-      } else if (typeof validator === 'string') {
-        me.prototype.callee(validator);
+      } else if (Array.isArray(validator)) {
+        // run custom validation method
+        me[validator[1]](validator[0], (typeof validator[2] === 'undefined') ? {} : validator[2]);
       }
     });
+    this.afterValidate();
     return this.errors.length === 0;
   }
 
   get validators()
   {
-    if (!this._validators.length) {
+    if (this._validators.length === 0) {
       const rules = this.rules();
       const me = this;
       Object.keys(rules).forEach((key) => {
@@ -213,16 +222,15 @@ export default class Model extends BaseObject
   _createValidator(attribute, rule)
   {
     let roleObj = null;
-    if (typeof rule === 'string') {
-      roleObj = rule;
+    if (Array.isArray(rule)) {
+      rule.unshift(attribute);
+      return rule;
     } else if (typeof rule.type !== 'undefined') {
-      const type = rule.type;
-      delete rule.type;
       rule.context = this;
       rule.attribute = attribute;
-      if (typeof type == 'string') {
-        roleObj = new Validator(rule);
-      } else if (type instanceof Validator) {
+      if (typeof rule.type == 'string') {
+        roleObj = new BuildValidator(rule);
+      } else if (rule.type instanceof Validator) {
         roleObj = new rule.type(rule);
       } else {
         throw `can't set validator`;
@@ -250,7 +258,6 @@ export default class Model extends BaseObject
   {
     const event = new Event(Model.EVENT_AFTER_VALIDATE, this);
     this.emit(event.name, event);
-    return true;
   }
 
   load(params = {})
@@ -277,7 +284,6 @@ export default class Model extends BaseObject
       insert: insert,
     });
     this.emit(event.name, event);
-    return true;
   }
 
   /**
@@ -362,7 +368,6 @@ export default class Model extends BaseObject
   {
     const event = new Event(Model.EVENT_AFTER_DELETE, this);
     this.emit(event.name, this);
-    return true;
   }
 
   /**

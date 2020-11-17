@@ -41,7 +41,6 @@ export default class BaseObject
         this._attributes[key] = args[key];
       } else {
         this[key] = args[key];
-        console.log(args[key]);
       }
     }
 

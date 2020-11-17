@@ -5,11 +5,16 @@ import Model from "../store/Model";
  * @property {Validator|string} type
  * @property {string} attribute
  * @property {Model} context
+ * @property {boolean} skipOnEmpty
+ * @property {function|boolean} when
  */
 export default class Validator extends BaseObject
 {
   constructor(args) {
     super(args);
+    if (!this.context instanceof Model) {
+      throw `context must instance of Model`;
+    }
   }
 
   attributes() {
@@ -17,16 +22,41 @@ export default class Validator extends BaseObject
       type: null,
       attribute: null,
       context: null,
-      message: null,
+      message: 'errors filed',
+      skipOnEmpty: true,
+      when: true,
     };
+  }
+
+  checkValue(value)
+  {
+    return true;
   }
 
   validate()
   {
-    if (false) {
-      this.context.setError(this.attribute, this.message);
+    let when = true;
+    if (typeof this.when === 'function') {
+      when = this.when(this.context);
+    }
+    if (when) {
+      return this.checkValue(this.context.getAttribute(this.attribute));
+    }
+  }
+
+  static isEmpty(value) {
+    if (typeof value === 'number' || typeof value === 'boolean') {
       return false;
     }
-    return true;
+    return value == '' || value === null;
+  }
+
+  static typeof(type, value) {
+    return typeof value === type;
+  }
+
+  isSkip(value)
+  {
+    return this.skipOnEmpty && Validator.isEmpty(value);
   }
 }
