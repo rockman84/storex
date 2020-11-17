@@ -4,6 +4,7 @@
 import BaseObject from "../base/BaseObject";
 import Collection from "./Collection";
 import Event from "../base/Event";
+import Validator from "@/components/storex/validator/Validator";
 
 export default class Model extends BaseObject
 {
@@ -35,6 +36,13 @@ export default class Model extends BaseObject
    * @private
    */
   _errors = [];
+
+  /**
+   * attributes validator class
+   * @type Validator[]
+   * @private
+   */
+  _validators;
 
   constructor(args) {
 
@@ -147,10 +155,23 @@ export default class Model extends BaseObject
   }
 
   /**
+   * ```
+   * return {
+   *   id: [
+   *     {type: 'integer', min: 3, max: 15},
+   *     {type: 'email'}
+   *   ],
+   *   name: [
+   *     {type: 'string', min: 4, max: 30},
+   *     {type: CustomValidationClass, foo: 'any', bar: 'any'},
+   *     'customValidationMethod',
+   *   ]
+   * };
+   * ```
    * define rule attributes
    * @returns {{}}
    */
-  rule() {
+  rules() {
     return {};
   }
 
@@ -159,10 +180,55 @@ export default class Model extends BaseObject
    * @param validate
    * @returns {boolean}
    */
-  validate() {
+  validate(attributes = null) {
     this.beforeValidate();
     this.afterValidate();
-    return true;
+    const me = this;
+    this.validators.forEach((validator) => {
+      if (validator instanceof Validator) {
+        validator.validate();
+      } else if (typeof validator === 'string') {
+        me.prototype.callee(validator);
+      }
+    });
+    return this.errors.length === 0;
+  }
+
+  get validators()
+  {
+    if (!this._validators.length) {
+      const rules = this.rules();
+      const me = this;
+      Object.keys(rules).forEach((key) => {
+        if (Array.isArray(rules[key])) {
+          rules[key].forEach((rule) => {
+            this._validators.push(me._createValidator(key, rule));
+          });
+        }
+      });
+    }
+    return this._validators;
+  }
+
+  _createValidator(attribute, rule)
+  {
+    let roleObj = null;
+    if (typeof rule === 'string') {
+      roleObj = rule;
+    } else if (typeof rule.type !== 'undefined') {
+      const type = rule.type;
+      delete rule.type;
+      rule.context = this;
+      rule.attribute = attribute;
+      if (typeof type == 'string') {
+        roleObj = new Validator(rule);
+      } else if (type instanceof Validator) {
+        roleObj = new rule.type(rule);
+      } else {
+        throw `can't set validator`;
+      }
+    }
+    return roleObj;
   }
 
   /**
