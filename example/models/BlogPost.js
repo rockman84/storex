@@ -23,25 +23,17 @@ export default class BlogPost extends Model
 
   rules() {
     return {
-      id: [
-        {type: 'required'},
-        {type: 'integer'}
-      ],
+      id: ['required', 'number'],
       title: [
         {type: 'default', value: function (model) {
           return 'Default Value function';
         }},
-        {type: 'required'},
-        {type: 'string', min: 5, max: 80},
+        'required',
+        'string',
         ['customValidation', {foo: 'bar'}],
       ],
-      status: [
-        {type: 'required'},
-        {type: 'integer'},
-      ],
-      created_at: [
-        {type: 'integer'},
-      ],
+      status: ['number'],
+      created_at: ['number'],
     };
   }
 

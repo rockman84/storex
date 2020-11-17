@@ -1,20 +1,54 @@
-/**
- * @property {string} firstName
- */
 import BaseObject from "../base/BaseObject";
 import Collection from "./Collection";
 import Event from "../base/Event";
 import Validator from "../validator/Validator";
 import BuildValidator from "../validator/BuildValidator";
 
+/**
+ * class Model
+ */
 export default class Model extends BaseObject
 {
+  /**
+   * event before save
+   * @type {string}
+   */
   static EVENT_BEFORE_SAVE = 'beforeSave';
+
+  /**
+   * event after save
+   * @type {string}
+   */
   static EVENT_AFTER_SAVE = 'afterSave';
+
+  /**
+   * event before delete
+   * @type {string}
+   */
   static EVENT_BEFORE_DELETE = 'beforeDelete';
+
+  /**
+   * event after delete
+   * @type {string}
+   */
   static EVENT_AFTER_DELETE = 'afterDelete';
+
+  /**
+   * event after insert
+   * @type {string}
+   */
   static EVENT_AFTER_INSERT = 'afterInsert';
+
+  /**
+   * event before validate
+   * @type {string}
+   */
   static EVENT_BEFORE_VALIDATE = 'beforeValidate';
+
+  /**
+   * event after validate
+   * @type {string}
+   */
   static EVENT_AFTER_VALIDATE = 'afterValidate';
 
   /**
@@ -219,6 +253,13 @@ export default class Model extends BaseObject
     return this._validators;
   }
 
+  /**
+   * init object validation by attribute
+   * @param attribute
+   * @param rule
+   * @returns {null|Validator|BuildValidator|Array}
+   * @private
+   */
   _createValidator(attribute, rule)
   {
     let roleObj = null;
@@ -235,6 +276,12 @@ export default class Model extends BaseObject
       } else {
         throw `can't set validator`;
       }
+    } else if (typeof rule === 'string') {
+      roleObj = new BuildValidator({
+        type: rule,
+        attribute: attribute,
+        context: this,
+      });
     }
     return roleObj;
   }
