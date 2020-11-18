@@ -31,12 +31,13 @@ export default class Collection extends BaseObject
 
   /**
    * set attributes config
-   * @returns {{link: {}, pageSize: number, model: null}}
+   * @returns {Object}
    */
   attributes() {
     return {
       model : null,
       pageSize: 50,
+      page: 1,
       link: {},
     };
   }
@@ -81,7 +82,7 @@ export default class Collection extends BaseObject
 
   deleteItem(id)
   {
-    this._data.slice(1, 1);
+    this._data = this._data.filter(data => data[this.model.constructor.primaryKeyAttribute] !== id);
   }
 
   findById(id)
@@ -96,11 +97,23 @@ export default class Collection extends BaseObject
 
   sync()
   {
-
+    // update or save record
+    this._data.forEach((model) => {
+      if (model.isDirtyAttribute) {
+        model.save();
+      }
+    });
+    // delete record
+    this._jobDelete.forEach((model) => {
+      model.delete();
+    });
   }
 
-  load(params)
+  load(params = {})
   {
-    this._data = this.model.load(params);
+    params = Object.assign({pageSize: this.pageSize, page: this.page}, params);
+    const className = this.this.model;
+    this._data = className.fetchAll(params);
+    return this;
   }
 }

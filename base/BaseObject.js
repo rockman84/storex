@@ -5,7 +5,12 @@ import Event from "./Event";
  */
 export default class BaseObject
 {
-  static EVENT_RESET_ATTRIBUTE = 'resetAttribute';
+  /**
+   * event on reset attributes
+   * @type {string}
+   */
+  static EVENT_RESET_ATTRIBUTES = 'resetAttributes';
+
   /**
    * attributes
    * @type {{}}
@@ -169,7 +174,7 @@ export default class BaseObject
   reset()
   {
     const event = new Event({
-      name: BaseObject.EVENT_RESET_ATTRIBUTE,
+      name: BaseObject.EVENT_RESET_ATTRIBUTES,
       target: this,
       params: {
         dirtyAttribute: this.getAttributes(),

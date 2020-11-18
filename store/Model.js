@@ -79,6 +79,10 @@ export default class Model extends BaseObject
    */
   _validators = [];
 
+  static collectionClass = Collection;
+
+  static primaryKeyAttribute = 'id';
+
   constructor(args) {
 
     super(args);
@@ -87,10 +91,8 @@ export default class Model extends BaseObject
      * @type {boolean}
      */
     Model.prototype.isNewRecord = true;
-    Model.prototype.extraParams = {};
-    Model.prototype.primaryKeyAttribute = 'id';
     Model.prototype.collection = null;
-    Model.prototype.collectionClass = Collection;
+    Model.prototype.show = true;
   }
 
   /**
@@ -102,7 +104,7 @@ export default class Model extends BaseObject
    */
   hasMany(className, link, name) {
     if (typeof this._relations[name] == 'undefined') {
-      this._relations[name] = new this.collectionClass({
+      this._relations[name] = new className.collectionClass({
         model: className,
         link: link,
       });
@@ -116,7 +118,7 @@ export default class Model extends BaseObject
    * @param link
    * @returns {Model}
    */
-  hasOne(className, link)
+  hasOne(className, link, name)
   {
     if (!className instanceof Model) {
       throw `className must instance of Model`;
@@ -133,10 +135,10 @@ export default class Model extends BaseObject
    */
   get primaryKey()
   {
-    if (typeof this[this.primaryKeyAttribute] == 'undefined') {
+    if (typeof this[this.constructor.primaryKeyAttribute] == 'undefined') {
       throw `can't find Id key in attributes`;
     }
-    return this[this.primaryKeyAttribute];
+    return this[this.constructor.primaryKeyAttribute];
   }
 
   /**
@@ -308,16 +310,11 @@ export default class Model extends BaseObject
     this.emit(event.name, event);
   }
 
-  load(params = {})
+  load(params = null)
   {
     let data = this._fetch(params);
     this._rawData = data;
     this.setAttributes(data);
-  }
-
-  static loadAll()
-  {
-
   }
 
   /**
@@ -370,9 +367,14 @@ export default class Model extends BaseObject
     return false;
   }
 
-  _fetch(params = {})
+  _fetch(params = null)
   {
     return localStorage.getItem(this.primaryKey);
+  }
+
+  static fetchAll(params = null)
+  {
+    return [];
   }
 
   _insert(attributes = null)
@@ -401,7 +403,7 @@ export default class Model extends BaseObject
     const result = this._delete();
     if (result) {
       if (this.collection instanceof Collection) {
-        this.collection.remove(this.primaryKeyAttribute, this.primaryKey);
+        this.collection.remove(this.constructor.primaryKeyAttribute, this.primaryKey);
       }
       this.afterDelete();
     }
