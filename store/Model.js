@@ -79,6 +79,8 @@ export default class Model extends BaseObject
    */
   _validators = [];
 
+  #_isNewRecord = true;
+
   static collectionClass = Collection;
 
   static primaryKeyAttribute = 'id';
@@ -237,7 +239,7 @@ export default class Model extends BaseObject
       }
     });
     this.afterValidate();
-    return this.errors.length === 0;
+    return Object.keys(this.errors).length === 0;
   }
 
   get validators()
