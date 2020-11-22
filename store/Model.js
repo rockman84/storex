@@ -88,11 +88,6 @@ export default class Model extends BaseObject
   constructor(args) {
 
     super(args);
-    /**
-     * check is new record
-     * @type {boolean}
-     */
-    Model.prototype.isNewRecord = true;
     Model.prototype.collection = null;
     Model.prototype.show = true;
   }
@@ -168,6 +163,11 @@ export default class Model extends BaseObject
   get errors()
   {
     return this._errors;
+  }
+
+  get isNewRecord()
+  {
+    return this.#_isNewRecord;
   }
 
   /**
@@ -312,124 +312,4 @@ export default class Model extends BaseObject
     this.emit(event.name, event);
   }
 
-  load(params = null)
-  {
-    let data = this._fetch(params);
-    this._rawData = data;
-    this.setAttributes(data);
-  }
-
-  /**
-   * event trigger after save data
-   * @param insert
-   * @param oldAttributes
-   * @returns {boolean}
-   */
-  afterSave(insert, oldAttributes) {
-    const event = new Event(Model.EVENT_AFTER_SAVE, this, {
-      oldAttributes: oldAttributes,
-      insert: insert,
-    });
-    this.emit(event.name, event);
-  }
-
-  /**
-   * event trigger before save data
-   * @param insert
-   * @returns {boolean}
-   */
-  beforeSave(insert) {
-    const event = new Event(Model.EVENT_BEFORE_SAVE, this, {
-      insert: insert,
-    });
-    this.emit(event.name, event);
-    return true;
-  }
-
-  /**
-   * action save data
-   * @param validate
-   * @returns {boolean}
-   */
-  save(validate = true, attributes = null) {
-    if ((validate && this.validate()) && this.beforeSave(this.isNewRecord)) {
-      let saving = false;
-      if (this.isNewRecord) {
-        saving = this._insert(this.getAttributes(attributes));
-      } else {
-        saving = this._update(this.getAttributes(attributes));
-      }
-      if (saving) {
-        this.afterSave(this.isNewRecord, this.getOldAttributes());
-        this.isNewRecord = false;
-        this._clearOldAttribute();
-        return true;
-      }
-    }
-    return false;
-  }
-
-  _fetch(params = null)
-  {
-    return localStorage.getItem(this.primaryKey);
-  }
-
-  static fetchAll(params = null)
-  {
-    return [];
-  }
-
-  _insert(attributes = null)
-  {
-    localStorage.setItem(this.primaryKey, this.getAttributes(attributes));
-    return true;
-  }
-
-  _update(attributes = null)
-  {
-    localStorage.setItem(this.primaryKey, this.getAttributes(attributes));
-    return true;
-  }
-
-  _delete()
-  {
-    localStorage.removeItem(this.primaryKey);
-    return true;
-  }
-
-  delete()
-  {
-    if (!this.beforeDelete() || this.isNewRecord) {
-      return false;
-    }
-    const result = this._delete();
-    if (result) {
-      if (this.collection instanceof Collection) {
-        this.collection.remove(this.constructor.primaryKeyAttribute, this.primaryKey);
-      }
-      this.afterDelete();
-    }
-    return result;
-  }
-
-  /**
-   * event trigger after delete data
-   * @returns {boolean}
-   */
-  afterDelete()
-  {
-    const event = new Event(Model.EVENT_AFTER_DELETE, this);
-    this.emit(event.name, this);
-  }
-
-  /**
-   * event trigger before delete data
-   * @returns {boolean}
-   */
-  beforeDelete()
-  {
-    const event = new Event(Model.EVENT_BEFORE_DELETE, this);
-    this.emit(event.name, this);
-    return true;
-  }
 }

@@ -1,4 +1,5 @@
 import Model from "../../store/Model";
+import AxiosModel from "@/components/storex/store/AxiosModel";
 
 /**
  * @property {BigInteger} id
@@ -6,7 +7,7 @@ import Model from "../../store/Model";
  * @property {BigInteger} status
  * @property {BigInteger} created_at
  */
-export default class BlogPost extends Model
+export default class BlogPost extends AxiosModel
 {
 
   static STATUS_PUBLISH = 2;
@@ -23,15 +24,15 @@ export default class BlogPost extends Model
 
   rules() {
     return {
-      id: ['required', 'number'],
+      // id: ['required', 'number'],
       title: [
 
         'required',
-        'function',
-        ['customValidation', {foo: 'bar'}],
+        // 'function',
+        // ['customValidation', {foo: 'bar'}],
       ],
-      status: ['number'],
-      created_at: ['number'],
+      // status: ['number'],
+      // created_at: ['number'],
     };
   }
 

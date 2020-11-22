@@ -1,22 +1,43 @@
 import Model from "./Model";
 import axios from "axios";
+import ObjectHelper from "@/components/storex/base/ObjectHelper";
 
+/**
+ * https://github.com/axios/axios
+ */
 export default class AxiosModel extends Model
 {
   static STATUS_OK = 'OK';
+  static STATUS_FAIL = 'fail';
 
   _axios = null;
+
+  #_response = null;
 
   constructor() {
     super();
     AxiosModel.prototype.axiosConfig = {
-      baseUrl: 'http://localhost:3000/' + this.className.toLowerCase(),
+      baseURL: 'http://localhost:8080/api',
     };
-    AxiosModel.prototype.response = null;
-    AxiosModel.prototype.view = 'view';
-    AxiosModel.prototype.insert = 'create';
-    AxiosModel.prototype.update = 'update';
-    AxiosModel.prototype.remove = 'delete';
+
+    AxiosModel.prototype.actions = {
+      index: {
+        method: 'get',
+      },
+      view: {
+        method: 'get',
+      },
+      insert: {
+        method: 'post',
+        url: '/user'
+      },
+      update: {
+        method: 'post',
+      },
+      remove: {
+        method: 'post',
+      }
+    };
   }
 
   /**
@@ -30,25 +51,54 @@ export default class AxiosModel extends Model
     return this._axios;
   }
 
-  _fetch(params = {}) {
-    return super._fetch(params);
-  }
+  async createRequest(action, config = {})
+  {
+    this.#_response = {};
 
-  _delete() {
-    return super._delete();
-  }
+    const requestConfig = Object.assign({
+      data: this.getAttributes(),
+      url: this.className.toLowerCase() + '/' + action,
+    }, this.actions[action], config);
 
-  _insert() {
-    let request = this.axios.post(this.insert, this.getAttributes());
-    request.then((response) => {
-      this.response = response;
-      this.rawData = response.data;
-      return this.response.statusText === AxiosModel.STATUS_OK;
+    await this.axios.request(requestConfig).then((response) => {
+      this.#_response = response;
+    }).catch((error) => {
+      if (error.response) {
+        this.#_response = Object.assign(this.#_response, error.response);
+        if (this.#_response.status === 422) {
+          ObjectHelper.forEach(this.#_response.data, (attr, error) => {
+            this.setError(attr, error[0]);
+          });
+        }
+      }
+      this.setError('_request', error.message);
     });
-
+    return this.#_response;
   }
 
-  _update() {
-    return super._update();
+  get response()
+  {
+    return this.#_response;
+  }
+
+  async _fetch(params = {}) {
+    const response = await this.createRequest('index', {params: params});
+    return response ? response.statusText === AxiosModel.STATUS_OK : false;
+  }
+
+  async _delete() {
+    const response = await this.createRequest('delete');
+    return response ? response.statusText === AxiosModel.STATUS_OK : false;
+  }
+
+  async _insert() {
+    const response = await this.createRequest('insert');
+
+    return response ? response.statusText === AxiosModel.STATUS_OK : false;
+  }
+
+  async _update() {
+    const response = await this.createRequest('update');
+    return response ? response.statusText === AxiosModel.STATUS_OK : false;
   }
 }

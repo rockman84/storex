@@ -220,11 +220,13 @@ export default class BaseObject
       throw `event must instance of Event`;
     }
     if (typeof this.listeners[eventName] === 'undefined') {
-      return null;
+      return true;
     }
+    let value = true;
     for (const key in this.listeners[eventName] ) {
-      this.listeners[eventName][key](event);
+      value = this.listeners[eventName][key](event) && value;
     }
+    return value;
   }
 
   /**

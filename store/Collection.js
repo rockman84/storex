@@ -1,5 +1,6 @@
 import BaseObject from "../base/BaseObject";
 import Model from "./Model";
+import Event from "@/components/storex/base/Event";
 
 
 /**
@@ -11,7 +12,21 @@ export default class Collection extends BaseObject
 {
   static EVENT_BEFORE_SYNC = 'beforeSync';
   static EVENT_AFTER_SYNC = 'afterSync';
+  /**
+   * event before add item collection
+   * @type {string}
+   */
+  static EVENT_BEFORE_ADD_ITEM = 'beforeAddItem';
 
+  /**
+   * event after add item collection
+   * @type {string}
+   */
+  static EVENT_AFTER_ADD_ITEM = 'afterAddItem';
+
+  static EVENT_BEFORE_REMOVE_ITEM = 'beforeRemove';
+
+  static EVENT_AFTER_REMOVE_ITEM = 'afterRemove'
   /**
    * data stores item collection
    * @type {[]}
@@ -65,7 +80,12 @@ export default class Collection extends BaseObject
 
   remove(attribute, value)
   {
-    this._data = this._data.filter(data => data[attribute] != value);
+    let event = new Event(Collection.EVENT_BEFORE_REMOVE_ITEM, this, {attribute: attribute, value: value});
+    if (this.emit(event.name, event)) {
+      this._data = this._data.filter(data => data[attribute] != value);
+      event = new Event(Collection.EVENT_AFTER_REMOVE_ITEM, this);
+      this.emit(event.name, event);
+    }
   }
 
   /**
@@ -73,9 +93,13 @@ export default class Collection extends BaseObject
    * @param item
    */
   push(item) {
-    if (item instanceof this.model) {
+    let event = new Event(Collection.EVENT_BEFORE_ADD_ITEM, this, {item: item});
+    if (this.emit(event.name, event) && item instanceof this.model) {
       item.collection = this;
-      return this._data.push(item);
+      const pushed = this._data.push(item);
+      event = new Event(Collection.EVENT_AFTER_ADD_ITEM, this, {item: item});
+      this.emit(event.name, event)
+      return pushed;
     }
     return false;
   }
@@ -97,6 +121,10 @@ export default class Collection extends BaseObject
 
   sync()
   {
+    let event = new Event(Collection.EVENT_BEFORE_SYNC, this);
+    if (!this.emit(event.name, event)) {
+      return false;
+    }
     // update or save record
     this._data.forEach((model) => {
       if (model.isDirtyAttribute) {
