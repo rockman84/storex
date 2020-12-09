@@ -2,6 +2,8 @@ import Model from "./Model";
 import axios from "axios";
 import ObjectHelper from "@/components/storex/base/ObjectHelper";
 
+'use strict';
+
 /**
  * https://github.com/axios/axios
  */

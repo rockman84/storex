@@ -2,6 +2,7 @@ import BaseObject from "../base/BaseObject";
 import Model from "./Model";
 import Event from "@/components/storex/base/Event";
 
+'use strict';
 
 /**
  * @property {Model} model
@@ -26,7 +27,10 @@ export default class Collection extends BaseObject
 
   static EVENT_BEFORE_REMOVE_ITEM = 'beforeRemove';
 
-  static EVENT_AFTER_REMOVE_ITEM = 'afterRemove'
+  static EVENT_AFTER_REMOVE_ITEM = 'afterRemove';
+
+  static EVENT_AFTER_FIND = 'afterFind';
+
   /**
    * data stores item collection
    * @type {[]}
@@ -35,6 +39,8 @@ export default class Collection extends BaseObject
   _data = [];
 
   _rawData = null;
+
+  _remove = [];
 
   constructor(arg) {
     super(arg);
@@ -58,11 +64,19 @@ export default class Collection extends BaseObject
   }
 
   /**
-   * clean all data collection
+   * clean all data collection without trigger event
    */
   cleanData()
   {
     this._data = [];
+  }
+
+  /**
+   * remove all data with trigger event
+   */
+  removeAll()
+  {
+    this.remove(() => true);
   }
 
   /**
@@ -73,19 +87,68 @@ export default class Collection extends BaseObject
     return this._data;
   }
 
+  set data(data) {
+    this._data = data;
+  }
+
   get count()
   {
     return this._data.length;
   }
 
-  remove(attribute, value)
+  /**
+   * remove item collection
+   * @param conditions {function}
+   * @returns {Model[]}
+   */
+  remove(conditions)
   {
-    let event = new Event(Collection.EVENT_BEFORE_REMOVE_ITEM, this, {attribute: attribute, value: value});
-    if (this.emit(event.name, event)) {
-      this._data = this._data.filter(data => data[attribute] != value);
-      event = new Event(Collection.EVENT_AFTER_REMOVE_ITEM, this);
-      this.emit(event.name, event);
+    const removeItem = [];
+    if (typeof conditions !== 'function') {
+      return [];
     }
+    this._data = this._data.filter((item) => {
+      if (conditions(item) && this.beforeRemove(item)) {
+        this._remove.push(item);
+        removeItem.push(item);
+        this.afterRemove(item);
+        return false;
+      } else {
+        return true;
+      }
+    });
+    return removeItem;
+  }
+
+  /**
+   *
+   * @param item {Model}
+   * @returns {*}
+   */
+  beforeRemove(item)
+  {
+    return this.emit(new Event(Collection.EVENT_BEFORE_REMOVE_ITEM, this, {items: item}));
+  }
+
+  /**
+   * trigger after remove item
+   * @param item {Model}
+   */
+  afterRemove(item)
+  {
+    this.emit(new Event(Collection.EVENT_AFTER_REMOVE_ITEM, this, {items: item}));
+  }
+
+  /**
+   * remove item collection by id key
+   * @param id
+   * @returns {Model[]}
+   */
+  removeItemId(id)
+  {
+    return this.remove((item) => {
+      return item[this.model.constructor.primaryKeyAttribute] == id;
+    })
   }
 
   /**
@@ -93,36 +156,54 @@ export default class Collection extends BaseObject
    * @param item
    */
   push(item) {
-    let event = new Event(Collection.EVENT_BEFORE_ADD_ITEM, this, {item: item});
-    if (this.emit(event.name, event) && item instanceof this.model) {
-      item.collection = this;
+    if (this.beforePush(item) && item instanceof this.model) {
       const pushed = this._data.push(item);
-      event = new Event(Collection.EVENT_AFTER_ADD_ITEM, this, {item: item});
-      this.emit(event.name, event)
+      this.afterPush(item);
       return pushed;
     }
     return false;
   }
 
-  deleteItem(id)
+  beforePush(item)
   {
-    this._data = this._data.filter(data => data[this.model.constructor.primaryKeyAttribute] !== id);
+
+    return this.emit(new Event(Collection.EVENT_BEFORE_ADD_ITEM, this, {item: item}));
+  }
+
+  afterPush(item)
+  {
+    this.emit(new Event(Collection.EVENT_AFTER_ADD_ITEM, this, {item: item}));
+  }
+
+  find(conditions)
+  {
+    let result = [];
+    if (typeof conditions !== 'function') {
+      return result;
+    }
+    return this._data.find(conditions);
+  }
+
+  filter(conditions)
+  {
+    return this._data.filter(conditions);
   }
 
   findById(id)
   {
-    return this.findByAttribute('id', id);
+    return this.find((item) => {
+      return item[this.model.constructor.primaryKeyAttribute] == id;
+    });
   }
 
   findByAttribute(attr, value)
   {
-    return this._data.find((data) => data[attr] == value);
+    return this.find((item) => item[attr] == value);
   }
 
   sync()
   {
-    let event = new Event(Collection.EVENT_BEFORE_SYNC, this);
-    if (!this.emit(event.name, event)) {
+    if (!this.emit(new Event(Collection.EVENT_BEFORE_SYNC, this))) {
       return false;
     }
     // update or save record

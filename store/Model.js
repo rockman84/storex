@@ -4,6 +4,8 @@ import Event from "../base/Event";
 import Validator from "../validator/Validator";
 import BuildValidator from "../validator/BuildValidator";
 
+'use strict';
+
 /**
  * class Model
  */
@@ -79,17 +81,15 @@ export default class Model extends BaseObject
    */
   _validators = [];
 
-  #_isNewRecord = true;
+  #_parent;
 
-  static collectionClass = Collection;
+  #_isNewRecord = true;
 
   static primaryKeyAttribute = 'id';
 
-  constructor(args) {
-
-    super(args);
-    Model.prototype.collection = null;
-    Model.prototype.show = true;
+  static get collectionClass()
+  {
+    return Collection;
   }
 
   /**
@@ -105,6 +105,7 @@ export default class Model extends BaseObject
         model: className,
         link: link,
       });
+      this._relations[name].parent = this;
     }
     return this._relations[name];
   }
@@ -122,6 +123,7 @@ export default class Model extends BaseObject
     }
     if (typeof this._relations[name] == 'undefined') {
       this._relations[name] = className.find(link);
+      this._relations[name].parent = this;
     }
     return this._relations[name]
   }
@@ -168,6 +170,16 @@ export default class Model extends BaseObject
   get isNewRecord()
   {
     return this.#_isNewRecord;
+  }
+
+  setParent(value)
+  {
+    this.#_parent = value;
+  }
+
+  get parent ()
+  {
+    return this.#_parent;
   }
 
   /**
@@ -297,8 +309,7 @@ export default class Model extends BaseObject
    */
   beforeValidate()
   {
-    const event = new Event(Model.EVENT_BEFORE_VALIDATE, this);
-    this.emit(event.name, event);
+    this.emit(new Event(Model.EVENT_BEFORE_VALIDATE, this));
     return true;
   }
 
@@ -308,8 +319,7 @@ export default class Model extends BaseObject
    */
   afterValidate()
   {
-    const event = new Event(Model.EVENT_AFTER_VALIDATE, this);
-    this.emit(event.name, event);
+    this.emit(new Event(Model.EVENT_AFTER_VALIDATE, this));
   }
 
 }

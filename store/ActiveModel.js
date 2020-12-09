@@ -20,11 +20,10 @@ export default class ActiveModel extends Model
   afterSave(insert, oldAttributes) {
     this.#_isNewRecord = false;
     this._clearOldAttribute();
-    const event = new Event(Model.EVENT_AFTER_SAVE, this, {
+    this.emit(new Event(Model.EVENT_AFTER_SAVE, this, {
       oldAttributes: oldAttributes,
       insert: insert,
-    });
-    this.emit(event.name, event);
+    }));
   }
 
   /**
@@ -33,10 +32,9 @@ export default class ActiveModel extends Model
    * @returns {boolean}
    */
   beforeSave(insert) {
-    const event = new Event(Model.EVENT_BEFORE_SAVE, this, {
+    this.emit(new Event(Model.EVENT_BEFORE_SAVE, this, {
       insert: insert,
-    });
-    this.emit(event.name, event);
+    }));
     return true;
   }
 
@@ -108,8 +106,7 @@ export default class ActiveModel extends Model
    */
   afterDelete()
   {
-    const event = new Event(Model.EVENT_AFTER_DELETE, this);
-    this.emit(event.name, this);
+    this.emit(new Event(Model.EVENT_AFTER_DELETE, this));
   }
 
   /**
@@ -118,8 +115,7 @@ export default class ActiveModel extends Model
    */
   beforeDelete()
   {
-    const event = new Event(Model.EVENT_BEFORE_DELETE, this);
-    this.emit(event.name, this);
+    this.emit(new Event(Model.EVENT_BEFORE_DELETE, this));
     return true;
   }
 }

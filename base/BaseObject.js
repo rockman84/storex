@@ -27,6 +27,8 @@ export default class BaseObject
 
   _listeners = {};
 
+  #_logs = [];
+
   constructor(args = {}) {
     // auto getter and setter attributes
     let attributes = this.attributes();
@@ -180,7 +182,7 @@ export default class BaseObject
         dirtyAttribute: this.getAttributes(),
       }
     });
-    this.emit(event.name, event);
+    this.emit(event);
     this.setAttributes(this._oldAttributes);
     this._clearOldAttribute();
     return this;
@@ -211,22 +213,36 @@ export default class BaseObject
   /**
    * trigger listener by event name
    * @param eventName
-   * @param event
+   * @param event {Event}
    * @returns {null}
    */
-  emit(eventName, event)
+  emit(event)
   {
     if (!event instanceof Event) {
       throw `event must instance of Event`;
     }
-    if (typeof this.listeners[eventName] === 'undefined') {
+    if (typeof this.listeners[event.name] === 'undefined') {
       return true;
     }
     let value = true;
-    for (const key in this.listeners[eventName] ) {
-      value = this.listeners[eventName][key](event) && value;
+    for (const key in this.listeners[event.name] ) {
+      value = this.listeners[event.name][key](event) && value;
     }
     return value;
+  }
+
+  get logs()
+  {
+    return this.#_logs;
+  }
+
+  set log(message){
+    this.#_logs.push(message);
+  }
+
+  clearLogs()
+  {
+    this.#_logs = [];
   }
 
   /**
