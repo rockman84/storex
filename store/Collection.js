@@ -1,6 +1,6 @@
 import BaseObject from "../base/BaseObject";
 import Model from "./Model";
-import Event from "@/components/storex/base/Event";
+import Event from "../base/Event";
 
 'use strict';
 
@@ -42,12 +42,11 @@ export default class Collection extends BaseObject
 
   _remove = [];
 
+  _source;
+
   constructor(arg) {
     super(arg);
     Collection.prototype._jobDelete = [];
-    if (!this.model instanceof Model) {
-      throw `model attributes must instance of Model`;
-    }
   }
 
   /**
@@ -56,7 +55,6 @@ export default class Collection extends BaseObject
    */
   attributes() {
     return {
-      model : null,
       pageSize: 50,
       page: 1,
       link: {},
@@ -147,7 +145,7 @@ export default class Collection extends BaseObject
   removeItemId(id)
   {
     return this.remove((item) => {
-      return item[this.model.constructor.primaryKeyAttribute] == id;
+      return item[this.constructor.modelClass.primaryKeyAttribute] == id;
     })
   }
 
@@ -156,7 +154,7 @@ export default class Collection extends BaseObject
    * @param item
    */
   push(item) {
-    if (this.beforePush(item) && item instanceof this.model) {
+    if (this.beforePush(item) && item instanceof this.constructor.modelClass) {
       const pushed = this._data.push(item);
       this.afterPush(item);
       return pushed;
@@ -192,7 +190,7 @@ export default class Collection extends BaseObject
   findById(id)
   {
     return this.find((item) => {
-      return item[this.model.constructor.primaryKeyAttribute] == id;
+      return item[this.constructor.modelClass.primaryKeyAttribute] == id;
     });
   }
 
@@ -221,8 +219,15 @@ export default class Collection extends BaseObject
   load(params = {})
   {
     params = Object.assign({pageSize: this.pageSize, page: this.page}, params);
-    const className = this.this.model;
-    this._data = className.fetchAll(params);
-    return this;
+    const className = this.constructor.modelClass;
+    if (className instanceof ActiveModel) {
+      this._data = className.fetchAll(params);
+      return this;
+    }
+  }
+
+  static get modelClass()
+  {
+    return Model;
   }
 }

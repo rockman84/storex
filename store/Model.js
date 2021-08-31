@@ -102,7 +102,6 @@ export default class Model extends BaseObject
   hasMany(className, link, name) {
     if (typeof this._relations[name] == 'undefined') {
       this._relations[name] = new className.collectionClass({
-        model: className,
         link: link,
       });
       this._relations[name].parent = this;
