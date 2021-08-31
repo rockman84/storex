@@ -6,6 +6,7 @@
     "type": "git",
     "url": "git+https://github.com/rockman84/storex.git"
   },
+  "type": "module",
   "homepage": "https://github.com/rockman84/storex/blob/main/README.md",
   "license": "GPL-3.0-or-later",
   "dependencies": {},
