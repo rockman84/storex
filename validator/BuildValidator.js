@@ -36,9 +36,9 @@ export default class BuildValidator extends Validator
       if (!result) {
         this.context.setError(this.attribute, `${this.attribute} must be ${this.type}`);
       } else if (this.type == 'string') {
-        if (this.max && value.length >= this.max) {
+        if (this.max && value.length > this.max) {
           this.context.setError(this.attribute, `${this.attribute} max ${this.max} characters`);
-        } else if (this.min && value.length <= this.min) {
+        } else if (this.min && value.length < this.min) {
           this.context.setError(this.attribute, `${this.attribute} min ${this.min} characters`);
         }
       }
