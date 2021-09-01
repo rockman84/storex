@@ -41,7 +41,7 @@ export default class Validator extends BaseObject
   {
     let when = true;
     if (typeof this.when === 'function') {
-      when = this.when(this.context);
+      when = this.when(this.context, this);
     }
     if (when) {
       return this.checkValue(this.context.getAttribute(this.attribute));

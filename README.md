@@ -25,6 +25,21 @@ class Comment extends Model {
             user_id : null,
             message: null,
         }
+    },
+    rule() {
+        return {
+            id: [
+              {type: 'integer'},
+              {type: 'required},
+            ],
+            user_id: [
+              {type: 'integer'},
+              {type: 'required'}
+            ],
+            message: [
+              {type: 'string', min: 5, max: 100},
+            ]
+        }
     }
 }
 

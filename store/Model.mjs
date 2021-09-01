@@ -62,14 +62,14 @@ export default class Model extends BaseObject
 
   /**
    * fetch raw data
-   * @type {{*}}
+   * @type {Object}
    * @private
    */
   _rawData = null;
 
   /**
    * errors storage
-   * @type {[]}
+   * @type {{}}
    * @private
    */
   _errors = {};
@@ -113,6 +113,7 @@ export default class Model extends BaseObject
    * relation has one will return model
    * @param className
    * @param link
+   * @param name
    * @returns {Model}
    */
   hasOne(className, link, name)
@@ -141,7 +142,7 @@ export default class Model extends BaseObject
 
   /**
    * get raw data
-   * @returns {null}
+   * @returns {Object}
    */
   get rawData()
   {
@@ -159,7 +160,7 @@ export default class Model extends BaseObject
 
   /**
    * get all errors message
-   * @returns {[]}
+   * @returns {{}}
    */
   get errors()
   {
@@ -227,7 +228,7 @@ export default class Model extends BaseObject
 
   /**
    * check value attributes base on rule
-   * @param validate
+   * @param attributes
    * @returns {boolean}
    */
   validate(attributes = null) {

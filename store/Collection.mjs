@@ -6,7 +6,7 @@ import Event from "../base/Event";
 
 /**
  * @property {Model} model
- * @property {integer} pageSize
+ * @property integer pageSize
  * @property {Object} link
  */
 export default class Collection extends BaseObject
