@@ -1,20 +1,10 @@
 export class BaseObject {
 
-    private _attributes : object = {};
+    protected _attributes : object = {};
 
-    private _oldAttributes = [];
+    protected _oldAttributes : object = {};
 
-    /**
-     * load data to attributes
-     * @param args
-     */
-    load(args : object = {}) {
-        for(const key in args) {
-            if (this.hasAttribute(key)) {
-                (this._attributes as any)[key] = (args as any)[key];
-            }
-        }
-    }
+    protected _listeners : object = {};
 
     /**
      * get class name
@@ -29,9 +19,22 @@ export class BaseObject {
      * @param attr
      * @param value
      */
-    public setAttribute(attr : string, value : any)
+    public setAttribute(name : string, value : any)
     {
-        (this._attributes as any)[attr] = value;
+        if (this.hasAttribute(name)) {
+            const oldValue = this.getAttribute(name);
+            if (oldValue !== value) {
+                (this._oldAttributes as any)[name] = this.getAttribute(name);
+            }
+        }
+        (this._attributes as any)[name] = value;
+    }
+
+    public setAttributes(params : object)
+    {
+        for(const key in params) {
+            this.setAttribute(key, (params as any)[key]);
+        }
     }
 
     /**
@@ -58,6 +61,23 @@ export class BaseObject {
     public get attributes() : Object
     {
         return this._attributes;
+    }
+
+    public get oldAttributes()
+    {
+        return this._oldAttributes;
+    }
+
+    /**
+     * load data to attributes
+     * @param params
+     */
+    load(params : object = {}) {
+        for(const key in params) {
+            if (this.hasAttribute(key)) {
+                this.setAttribute(key, (params as any)[key]);
+            }
+        }
     }
 
 }
