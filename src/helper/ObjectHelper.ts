@@ -12,7 +12,7 @@ export class ObjectHelper
         return Array.isArray(value);
     }
 
-    static merge(value : Object[], merge : Object)
+    static merge(value : object[], merge : object)
     {
         if (ObjectHelper.isObject(value)) {
             Object.assign(value, merge);

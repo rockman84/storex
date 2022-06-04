@@ -32,7 +32,7 @@ export class BaseObject {
 
     public setAttributes(params : object)
     {
-        for(const key in params) {
+        for(const key of Object.keys(params)) {
             this.setAttribute(key, (params as any)[key]);
         }
     }
@@ -58,7 +58,7 @@ export class BaseObject {
     /**
      * get all attributes key and value
      */
-    public get attributes() : Object
+    public get attributes() : object
     {
         return this._attributes;
     }

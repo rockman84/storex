@@ -1,9 +1,9 @@
 import {BookModel} from "./model/book.model";
 
-let book = new BookModel();
+const book = new BookModel();
 book.load({id: '1000', name: 'siti nurbaya', status: 'ikan'});
 
-let book2 = new BookModel();
+const book2 = new BookModel();
 
 // book.name = 'Sherlock';
 
