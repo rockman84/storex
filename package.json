@@ -15,8 +15,13 @@
   "bugs": {
     "url": "https://github.com/rockman84/storex/issues"
   },
-  "main": "index.js",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib/**/*"
+  ],
   "scripts": {
+    "dev" : "npx ts-node example/index.ts",
     "test": "TERM=dumb jest --config jestconfig.json --watch",
     "build": "tsc",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
