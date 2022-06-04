@@ -10,11 +10,13 @@
     "experimentalDecorators": true
   },
   "include": [
+    "__tests__",
     "src",
     "example"
   ],
   "exclude": [
     "node_modules",
+    "example",
     "**/__tests__/*"
   ]
 }

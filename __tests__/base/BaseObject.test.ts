@@ -1,7 +1,8 @@
 import {BaseObject} from "../../src";
-import {attribute} from "../../lib/decorator/attributes";
+import {attribute} from "../../src/decorator/attributes";
+import {Model} from "../../src/model";
 
-class TestObject extends BaseObject {
+class TestObject extends Model {
     @attribute
     public id : string = '123';
 

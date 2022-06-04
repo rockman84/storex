@@ -1,9 +1,7 @@
 import {BaseObject} from "../base/base.object";
+import {Model} from "../model";
 
-export function attribute(target: any, name: string) {
-    if (!(target instanceof BaseObject)) {
-        throw Error('class must be instance of BaseObject');
-    }
+export function attribute(target: Model, name: string) {
     Object.defineProperty( target, name, {
         enumerable: true,
         get() {
