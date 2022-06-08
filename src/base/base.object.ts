@@ -1,3 +1,5 @@
+import {Event} from "./event";
+
 export class BaseObject {
 
     protected _attributes : object = {};
@@ -6,6 +8,13 @@ export class BaseObject {
 
     protected _listeners : object = {};
 
+    constructor(args? : object) {
+        for(const key in args) {
+            if (key in this) {
+                (this as any)[key] = (args as any)[key];
+            }
+        }
+    }
     /**
      * get class name
      */
@@ -68,11 +77,16 @@ export class BaseObject {
         return this._oldAttributes;
     }
 
+    public clearOldAttributes()
+    {
+        this._oldAttributes = {};
+    }
+
     /**
      * load data to attributes
      * @param params
      */
-    load(params : object = {}) {
+    load(params : object) {
         for(const key in params) {
             if (this.hasAttribute(key)) {
                 this.setAttribute(key, (params as any)[key]);
@@ -80,4 +94,29 @@ export class BaseObject {
         }
     }
 
+    public get listeners() : object
+    {
+        return this._listeners;
+    }
+
+    public addListeners(name : string, callers : () => void)
+    {
+        if (typeof (this._listeners as any)[name] === 'undefined') {
+            (this._listeners as any)[name] = [];
+        }
+        (this._listeners as any)[name].push(callers);
+    }
+
+    public emit(event : string|Event)
+    {
+        let name = event instanceof Event ? event.name : event;
+        if (typeof (this.listeners as any)[name] === 'undefined') {
+            return true;
+        }
+        let value = true;
+        for (const key of Object.keys((this.listeners as any)[name]) ) {
+            value = (this.listeners as any)[name][key](event, this) && value;
+        }
+        return value;
+    }
 }

@@ -1,6 +1,24 @@
 import {BaseObject} from "./base/base.object";
+import {Collection} from "./collection";
 
 export class Model extends BaseObject
 {
     protected _relations : object = {};
+
+    protected _errors : object = {};
+
+    public static getCollectionClass() : typeof Collection
+    {
+        return Collection;
+    }
+
+    public get errors() : object
+    {
+        return this._errors;
+    }
+
+    public async validate() : Promise<boolean>
+    {
+        return true;
+    }
 }
