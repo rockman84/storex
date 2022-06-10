@@ -1,9 +1,6 @@
-import {BaseObject} from "../../src";
-import {attribute} from "../../src/decorator/attribute";
-import {Model} from "../../src/Model";
+import {Model} from "../../src";
 import {AuthorModel} from "./author.model";
-import {hasMany} from "../../src/decorator/has.many";
-import {hasOne} from "../../src/decorator/has.one";
+import {hasOne, attribute} from "../../src";
 
 export class BookModel extends Model
 {
@@ -13,8 +10,11 @@ export class BookModel extends Model
     @attribute()
     public name? : string;
 
+    @attribute()
+    public author_id? : number;
+
     show?: boolean = true;
 
-    @hasOne()
+    @hasOne({attribute: 'author_id', targetAttribute: 'id'})
     public author? : AuthorModel;
 }

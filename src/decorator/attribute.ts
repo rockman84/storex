@@ -3,7 +3,7 @@ import "reflect-metadata";
 
 export function attribute() {
     return (target: BaseObject, name: string) : void => {
-        const metadata = Reflect.getMetadata('design:type', target, name);
+        //const metadata = Reflect.getMetadata('design:type', target, name);
         const key = name;
         Reflect.defineProperty( target, name, {
             enumerable: true,

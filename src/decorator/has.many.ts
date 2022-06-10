@@ -2,7 +2,14 @@ import {Model} from "../model";
 import {Collection} from "../collection";
 import "reflect-metadata";
 
-export function hasMany() {
+export interface HasManyOptions {
+    attribute : string;
+    targetAttribute: string;
+}
+/**
+ * decorator has many property
+ */
+export function hasMany(options?: HasManyOptions) {
     return (target: Model, property: string) => {
         const metadata = Reflect.getMetadata("design:type", target, property);
         const objectClass = metadata.valueOf();

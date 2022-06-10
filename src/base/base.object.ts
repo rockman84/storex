@@ -2,12 +2,34 @@ import {Event} from "./event";
 
 export class BaseObject {
 
+    /**
+     * attributes mapping
+     * @protected
+     */
     protected _attributes : object = {};
 
+    /**
+     * old attribute mapping
+     * @protected
+     */
     protected _oldAttributes : object = {};
 
+    /**
+     * listeners mapping
+     * @protected
+     */
     protected _listeners : object = {};
 
+    /**
+     * state of new object
+     * @protected
+     */
+    protected _isNew : boolean = true;
+
+    /**
+     * constructor
+     * @param args
+     */
     constructor(args? : object) {
         for(const key in args) {
             if (key in this) {
@@ -18,17 +40,17 @@ export class BaseObject {
     /**
      * get class name
      */
-    public get className()
+    public get className() : string
     {
         return this.constructor.name;
     }
 
     /**
      * set attribute value
-     * @param attr
+     * @param name
      * @param value
      */
-    public async setAttribute(name : string, value : any)
+    public setAttribute(name : string, value : any) : void
     {
         if (this.hasAttribute(name)) {
             const oldValue = this.getAttribute(name);
@@ -40,7 +62,33 @@ export class BaseObject {
         (this._attributes as any)[name] = value;
     }
 
-    public setAttributes(params : object)
+    /**
+     * load data to exist attributes
+     * @param params
+     */
+    load(params : object) : boolean
+    {
+        let load = false;
+
+        this.emit(new Event(BaseObjectEvent.BEFORE_LOAD, this, params));
+
+        for(const key of Object.keys(params)) {
+            if (this.hasAttribute(key)) {
+                this.setAttribute(key, (params as any)[key]);
+                load = true;
+            }
+        }
+
+        this.emit(new Event(BaseObjectEvent.AFTER_LOAD, this, params));
+
+        return load;
+    }
+
+    /**
+     * set or add attributes
+     * @param params
+     */
+    public setAttributes(params : object) : void
     {
         for(const key of Object.keys(params)) {
             this.setAttribute(key, (params as any)[key]);
@@ -55,7 +103,7 @@ export class BaseObject {
     {
         if (typeof this._attributes === 'undefined') {
             return false;
-        };
+        }
         return (name in this._attributes);
     }
 
@@ -63,7 +111,7 @@ export class BaseObject {
      * get attribute value by name
      * @param name
      */
-    public getAttribute(name : string)
+    public getAttribute(name : string) : any
     {
         return this.hasAttribute(name) ? (this._attributes as any)[name] : null;
     }
@@ -76,34 +124,36 @@ export class BaseObject {
         return this._attributes;
     }
 
-    public get oldAttributes()
+    /**
+     * get all old attributes
+     */
+    public get oldAttributes() : object
     {
         return this._oldAttributes;
     }
 
-    public clearOldAttributes()
+    /**
+     * clear all old attributes
+     */
+    public clearOldAttributes() : void
     {
         this._oldAttributes = {};
     }
 
     /**
-     * load data to attributes
-     * @param params
+     * get all listeners
      */
-    load(params : object) {
-        for(const key in params) {
-            if (this.hasAttribute(key)) {
-                this.setAttribute(key, (params as any)[key]);
-            }
-        }
-    }
-
     public get listeners() : object
     {
         return this._listeners;
     }
 
-    public addListeners(name : string, callers : (e:Event, object:this) => void) : void
+    /**
+     * add listeners
+     * @param name
+     * @param callers
+     */
+    public addListeners(name : string, callers : (e: Event|string, object: this) => void) : void
     {
         if (typeof (this._listeners as any)[name] === 'undefined') {
             (this._listeners as any)[name] = [];
@@ -111,6 +161,10 @@ export class BaseObject {
         (this._listeners as any)[name].push(callers);
     }
 
+    /**
+     * trigger listeners event
+     * @param event
+     */
     public emit(event : BaseObjectEvent|Event|string) : void
     {
         const name = event instanceof Event ? event.name : event;
@@ -125,4 +179,6 @@ export class BaseObject {
 
 export enum BaseObjectEvent {
     CHANGED_ATTRIBUTE = 'changedAttribute',
+    BEFORE_LOAD = 'beforeLoad',
+    AFTER_LOAD = 'afterLoad',
 }
