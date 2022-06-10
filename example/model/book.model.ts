@@ -1,8 +1,8 @@
 import {BaseObject} from "../../src";
-import {attribute} from "../../src/decorator/attributes";
+import {attribute} from "../../src/decorator/attribute";
 import {Model} from "../../src/Model";
 import {AuthorModel} from "./author.model";
-import {getHasMany, hasMany} from "../../src/decorator/has.many";
+import {hasMany} from "../../src/decorator/has.many";
 import {hasOne} from "../../src/decorator/has.one";
 
 export class BookModel extends Model

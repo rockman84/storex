@@ -1,6 +1,6 @@
 import {BookModel} from "../../../example/model/book.model";
-import {attribute} from "../../../src/decorator/attributes";
-import {EventObject} from "../../../src";
+import {attribute} from "../../../src/decorator/attribute";
+import {ModelEvent} from "../../../src";
 import {AuthorModel} from "../../../example/model/author.model";
 import {BookCollection} from "../../../example/model/book.collection";
 
@@ -40,9 +40,9 @@ test('Test Book Model', () => {
             changes = m.name + ' - Part 1';
             m.name = m.name + ' New';
         });
-        book.addListeners(EventObject.CHANGED_ATTRIBUTE, (e) => {
+        book.addListeners(ModelEvent.BEFORE_VALIDATE, (e) => {
             console.log(e);
-        })
+        });
         expect(changes).toEqual(null);
         book.emit('eventAdd');
         expect(changes).toEqual(v.name + ' - Part 1');
@@ -54,6 +54,8 @@ test('Test Book Model', () => {
 
         // relation hasMany
         expect(author?.books).toBeInstanceOf(BookCollection);
+        expect(author?.books?.parent).toEqual(author);
+
     });
 });
 

@@ -28,13 +28,13 @@ export class BaseObject {
      * @param attr
      * @param value
      */
-    public setAttribute(name : string, value : any)
+    public async setAttribute(name : string, value : any)
     {
         if (this.hasAttribute(name)) {
             const oldValue = this.getAttribute(name);
             if (oldValue !== value) {
                 (this._oldAttributes as any)[name] = this.getAttribute(name);
-                this.emit(EventObject.CHANGED_ATTRIBUTE);
+                this.emit(BaseObjectEvent.CHANGED_ATTRIBUTE);
             }
         }
         (this._attributes as any)[name] = value;
@@ -53,7 +53,7 @@ export class BaseObject {
      */
     public hasAttribute(name : string) : boolean
     {
-        if (typeof this._attributes == 'undefined') {
+        if (typeof this._attributes === 'undefined') {
             return false;
         };
         return (name in this._attributes);
@@ -111,20 +111,18 @@ export class BaseObject {
         (this._listeners as any)[name].push(callers);
     }
 
-    public async emit(event : string|Event) : Promise<boolean>
+    public emit(event : BaseObjectEvent|Event|string) : void
     {
         const name = event instanceof Event ? event.name : event;
         if (typeof (this.listeners as any)[name] === 'undefined') {
-            return true;
+            return;
         }
-        let value = true;
         for (const key of Object.keys((this.listeners as any)[name]) ) {
-            value = await (this.listeners as any)[name][key](event, this) && value;
+            (this.listeners as any)[name][key](event, this);
         }
-        return value;
     }
 }
 
-export enum EventObject {
+export enum BaseObjectEvent {
     CHANGED_ATTRIBUTE = 'changedAttribute',
 }

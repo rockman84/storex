@@ -1,4 +1,4 @@
-import {BaseObject} from "./base/base.object";
+import {BaseObject, BaseObjectEvent} from "./base/base.object";
 import {Collection} from "./collection";
 
 export class Model extends BaseObject
@@ -22,4 +22,9 @@ export class Model extends BaseObject
     {
         return true;
     }
+}
+
+export enum ModelEvent {
+    BEFORE_VALIDATE = 'beforeValidate',
+    AFTER_VALIDATE = 'afterValidate',
 }

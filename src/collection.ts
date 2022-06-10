@@ -1,8 +1,16 @@
 import {Model} from "./model";
+import {BaseObject} from "./base/base.object";
 
-export class Collection
+export class Collection extends BaseObject
 {
+    private _parent? : Model|null;
+
     private _data : Model[] = [];
+
+    public get parent()
+    {
+        return this._parent;
+    }
 
     public get data()
     {

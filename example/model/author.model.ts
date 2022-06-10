@@ -1,5 +1,5 @@
 import {Model} from "../../src";
-import {attribute} from "../../src/decorator/attributes";
+import {attribute} from "../../src/decorator/attribute";
 import {hasMany} from "../../src/decorator/has.many";
 import {BookCollection} from "./book.collection";
 
