@@ -1,16 +1,21 @@
 import {Model} from "../model";
 import "reflect-metadata";
+import {BookModel} from "../../example/model/book.model";
 
-export function hasOne (type : string = Model.name) {
+export function hasOne () {
     return function (target : Model, name : string) {
-        let t = Reflect.metadata('design:type', target);
-        console.log(t.name);
+        const metadata = Reflect.getMetadata('design:type', target, name);
         Reflect.defineProperty(target, name , {
             set(value) {
-
+                if (value instanceof metadata.valueOf()) {
+                    this._hasOne[name] = value;
+                }
             },
             get() {
-
+                if (!(name in this._hasOne)) {
+                    this._hasOne[name] = new (metadata.valueOf() as any);
+                }
+                return this._hasOne[name];
             }
         });
     }

@@ -34,6 +34,7 @@ export class BaseObject {
             const oldValue = this.getAttribute(name);
             if (oldValue !== value) {
                 (this._oldAttributes as any)[name] = this.getAttribute(name);
+                this.emit(EventObject.CHANGED_ATTRIBUTE);
             }
         }
         (this._attributes as any)[name] = value;
@@ -52,6 +53,9 @@ export class BaseObject {
      */
     public hasAttribute(name : string) : boolean
     {
+        if (typeof this._attributes == 'undefined') {
+            return false;
+        };
         return (name in this._attributes);
     }
 
@@ -99,7 +103,7 @@ export class BaseObject {
         return this._listeners;
     }
 
-    public addListeners(name : string, callers : () => void)
+    public addListeners(name : string, callers : (e:Event, object:this) => void) : void
     {
         if (typeof (this._listeners as any)[name] === 'undefined') {
             (this._listeners as any)[name] = [];
@@ -107,16 +111,20 @@ export class BaseObject {
         (this._listeners as any)[name].push(callers);
     }
 
-    public emit(event : string|Event)
+    public async emit(event : string|Event) : Promise<boolean>
     {
-        let name = event instanceof Event ? event.name : event;
+        const name = event instanceof Event ? event.name : event;
         if (typeof (this.listeners as any)[name] === 'undefined') {
             return true;
         }
         let value = true;
         for (const key of Object.keys((this.listeners as any)[name]) ) {
-            value = (this.listeners as any)[name][key](event, this) && value;
+            value = await (this.listeners as any)[name][key](event, this) && value;
         }
         return value;
     }
+}
+
+export enum EventObject {
+    CHANGED_ATTRIBUTE = 'changedAttribute',
 }

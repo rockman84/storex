@@ -3,7 +3,8 @@ import {Collection} from "./collection";
 
 export class Model extends BaseObject
 {
-    protected _relations : object = {};
+    protected _hasOne : object = {};
+    protected _hasMany : object = {};
 
     protected _errors : object = {};
 

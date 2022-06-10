@@ -15,6 +15,6 @@ export class BookModel extends Model
 
     show?: boolean = true;
 
-    @hasOne(AuthorModel.name)
+    @hasOne()
     public author? : AuthorModel;
 }

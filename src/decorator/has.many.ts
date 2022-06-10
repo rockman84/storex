@@ -1,18 +1,23 @@
 import {Model} from "../model";
 import "reflect-metadata";
+import {name} from "ts-jest/dist/transformers/hoist-jest";
 
 const formatMetadataKey = Symbol("format");
 
 export function hasMany() {
     return function (target: Model, property: string) {
-        // let t = Reflect.getMetadata("design:type", target, property);
-        // console.log(t.name);
+        const metadata = Reflect.getMetadata("design:type", target, property);
         Reflect.defineProperty(target, property, {
             set(value) {
-                console.log('hasmany set', this.author);
+                if (value instanceof metadata.valueOf()) {
+                    this._hasMany[name] = value;
+                }
             },
             get() {
-                console.log('hasmany get', typeof this);
+                if (!(name in this._hasMany)) {
+                    this._hasMany[name] = new (metadata.valueOf() as any);
+                }
+                return this._hasMany[name];
             }
         });
     }

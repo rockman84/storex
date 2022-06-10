@@ -3,18 +3,20 @@ import "reflect-metadata";
 
 export function attribute() {
     return (target: BaseObject, name: string) : void => {
+        const metadata = Reflect.getMetadata('design:type', target, name);
+        const key = name;
         Reflect.defineProperty( target, name, {
             enumerable: true,
             configurable: true,
             get() {
-                if (this.hasAttribute(name)) {
-                    return this.getAttribute(name);
+                if (this.hasAttribute(key)) {
+                    return this.getAttribute(key);
                 }
-                this.setAttribute(name, null);
+                this.setAttribute(key, null);
                 return null;
             },
             set(value) {
-                this.setAttribute(name, value);
+                this.setAttribute(key, value);
             }
         });
     }
