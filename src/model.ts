@@ -37,6 +37,11 @@ export class Model extends BaseObject
         return this._errors;
     }
 
+    public rule() : object[]
+    {
+        return [];
+    }
+
     public async validate() : Promise<boolean>
     {
         this.emit(new Event(ModelEvent.BEFORE_VALIDATE, this));

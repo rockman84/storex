@@ -12,4 +12,10 @@ export class AuthorModel extends Model
 
     @hasMany({attribute: 'id', targetAttribute: 'author_id'})
     books? : BookCollection;
+
+    public rule(): object[] {
+        return [
+
+        ];
+    }
 }
