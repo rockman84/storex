@@ -10,7 +10,7 @@ export class AuthorModel extends Model
     @attribute()
     name? : string;
 
-    @hasMany({attribute: 'id', targetAttribute: 'author_id'})
+    @hasMany({collectionClass: BookCollection ,attribute: 'id', targetAttribute: 'author_id'})
     books? : BookCollection;
 
     public rule(): object[] {
