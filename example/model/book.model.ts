@@ -15,6 +15,6 @@ export class BookModel extends Model
 
     show?: boolean = true;
 
-    @hasOne({attribute: 'author_id', targetAttribute: 'id'})
+    @hasOne({attribute: 'author_id', targetAttribute: 'id', createModelWhenEmpty: true})
     public author? : AuthorModel;
 }

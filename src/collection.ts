@@ -17,13 +17,31 @@ export class Collection extends BaseObject
         return this._data;
     }
 
+    public clearData()
+    {
+        this._data = [];
+    }
+
     public get count()
     {
         return this._data.length;
     }
 
-    public clearData()
+    public push(item : Model) : void
     {
-        this._data = [];
+        this.beforePush(item).then((result) => {
+            result && this.push(item);
+            this.afterPush(item);
+        });
+    }
+
+    public async beforePush(item : Model) : Promise<boolean>
+    {
+        return true;
+    }
+
+    public afterPush(item : Model) : void
+    {
+        return;
     }
 }

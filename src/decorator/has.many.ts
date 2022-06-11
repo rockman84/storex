@@ -11,13 +11,15 @@ export interface HasManyOptions {
  */
 export function hasMany(options?: HasManyOptions) {
     return (target: Model, property: string) => {
+        const defaultOptions = {attribute: null, targetAttribute: null};
+        const opts = {...defaultOptions, ...options};
         const metadata = Reflect.getMetadata("design:type", target, property);
         const objectClass = metadata.valueOf();
         if (objectClass instanceof Collection) {
             throw new Error(` ${metadata.name} @hasMany should instance Collection`);
         }
         Reflect.defineProperty(target, property, {
-            set(value) {
+            set(value: any) {
                 if (value instanceof objectClass) {
                     this._hasMany[property] = value;
                 }

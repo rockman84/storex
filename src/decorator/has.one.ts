@@ -1,7 +1,7 @@
 import {Model} from "../model";
 import "reflect-metadata";
 
-export interface hasOneOptions {
+export interface HasOneOptions {
     attribute?: string;
     targetAttribute?: string;
     createModelWhenEmpty?:boolean;
@@ -9,7 +9,7 @@ export interface hasOneOptions {
 /**
  * decorator has one property
  */
-export function hasOne (options?:hasOneOptions) {
+export function hasOne (options?:HasOneOptions) {
     const defaultOptions = {attribute: null, targetAttribute: null, createModelWhenEmpty: true};
     const opts = {...defaultOptions, ...options};
     return (target : Model, property : string) => {
