@@ -22,7 +22,8 @@
   ],
   "scripts": {
     "dev": "npx ts-node example/index.ts",
-    "test": "TERM=dumb jest --config jestconfig.json --watch --cache=false",
+    "testwatch": "TERM=dumb jest --config jestconfig.json --watch --cache=false",
+    "test": "TERM=dumb jest --config jestconfig.json --cache=false",
     "clear" : "jest --clearCache",
     "build": "tsc",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
