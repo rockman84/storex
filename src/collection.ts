@@ -3,9 +3,9 @@ import {BaseObject} from "./base/base.object";
 
 export class Collection extends BaseObject
 {
-    private _parent? : Model|null;
+    private _parent? : typeof Model|null;
 
-    private _data : Model[] = [];
+    private _data : typeof Model[] = [];
 
     public get parent()
     {
@@ -27,20 +27,20 @@ export class Collection extends BaseObject
         return this._data.length;
     }
 
-    public push(item : Model) : void
+    public push(item : typeof Model) : void
     {
         this.beforePush(item).then((result) => {
-            result && this.push(item);
+            this._data.push(item);
             this.afterPush(item);
         });
     }
 
-    public async beforePush(item : Model) : Promise<boolean>
+    public async beforePush(item : typeof Model) : Promise<boolean>
     {
         return true;
     }
 
-    public afterPush(item : Model) : void
+    public afterPush(item : typeof Model) : void
     {
         return;
     }

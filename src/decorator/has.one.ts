@@ -15,6 +15,8 @@ export function hasOne (options:HasOneOptions) {
     const opts = {...defaultOptions, ...options};
     return (target : Model, property : string) => {
         Reflect.defineProperty(target, property , {
+            enumerable: true,
+            configurable: true,
             set(value) {
                 if (value instanceof options.modelClass) {
                     this._hasOne[property] = value;

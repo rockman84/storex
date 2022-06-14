@@ -1,0 +1,31 @@
+{
+  "name": "storex",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "run-p type-check build-only",
+    "preview": "vite preview --port 4173",
+    "test:e2e": "start-server-and-test preview http://127.0.0.1:4173/ 'cypress open --e2e'",
+    "test:e2e:ci": "start-server-and-test preview http://127.0.0.1:4173/ 'cypress run --e2e'",
+    "test:unit": "cypress open --component",
+    "test:unit:ci": "cypress run --component --quiet --reporter spec",
+    "build-only": "vite build",
+    "type-check": "vue-tsc --noEmit"
+  },
+  "dependencies": {
+    "vue": "^3.2.36",
+    "vue-router": "^4.0.15"
+  },
+  "devDependencies": {
+    "@types/node": "^16.11.36",
+    "@vitejs/plugin-vue": "^2.3.3",
+    "@vitejs/plugin-vue-jsx": "^1.3.10",
+    "@vue/tsconfig": "^0.1.3",
+    "cypress": "^10.0.2",
+    "npm-run-all": "^4.1.5",
+    "start-server-and-test": "^1.14.0",
+    "typescript": "~4.7.2",
+    "vite": "^2.9.9",
+    "vue-tsc": "^0.35.2"
+  }
+}

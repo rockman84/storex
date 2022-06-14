@@ -18,15 +18,18 @@ export function hasMany(options?: HasManyOptions) {
             throw `${objectClass.name} @hasMany should instance Collection`;
         }
         Reflect.defineProperty(target, property, {
+            enumerable: true,
+            configurable: true,
             set(value: any) {
                 if (value instanceof objectClass) {
                     this._hasMany[property] = value;
                 }
             },
             get() {
-                if (!(property in this._hasMany)) {
+                console.log(property);
+                if (!(property in Object.keys(this._hasMany))) {
                     const collection = new (objectClass as any)();
-                    collection._parent = this;
+                    //collection._parent = this;
                     this._hasMany[property] = collection;
                 }
                 return this._hasMany[property];
