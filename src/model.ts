@@ -179,11 +179,6 @@ export class Model extends BaseObject
         this.emit(new Event(ModelEvent.AFTER_VALIDATE, this));
         return true;
     }
-
-    public async find(params : object)
-    {
-
-    }
 }
 
 export enum ModelEvent {

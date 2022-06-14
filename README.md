@@ -1,23 +1,53 @@
 # storex
 Centralized Store Management
 
-### model
-```
-class User extends Model
+### Model
+``` typescript
+// author.model.ts
+class Author extends Model
 {
-    attributes() {
-        return {
-            id: null,
-            email: null,
-            username: null,
-        };
-    }
-    get comment()
-    {
-        return this.hasMany(Comment, {user_id: this.id}, 'comment);
-    }
+    @attribute()
+    id? : number;
+    
+    @attribute()
+    name? : string;
 }
 
+// book.model.ts
+class BookModel extends Model
+{
+    @attribute()
+    id? : number;
+    
+    @attribute()
+    name? : string;
+    
+    @hasOne()
+    author? : AuthorModel
+}
+```
+
+### Collection
+
+```typescript
+// book.collection.ts
+import {Collection} from "./collection";
+
+class BookCollection extends Collection
+{
+    
+}
+
+// author.collection.ts
+class AuthorCollection extends Collection
+{
+    
+}
+```
+
+
+### Validation Rule
+```typescript
 class Comment extends Model {
     attributes() {
         return {
@@ -45,20 +75,18 @@ class Comment extends Model {
 
 ```
 
-```
-let user = new User({
-    id: 1,
-    email: 'sample@email.com',
-    username: 'john_xs' 
-});
+### Usage
+```typescript
+import {AuthorModel} from "./author.model";
 
-user.email // sample@email.com
-user.email = 'my@email.com' // my@email.com
-user.comment.push(new Comment({
-    id: 1,
-    message: 'Hi There!',
-}));
+const author = new AuthorModel({name: 'JK Rowling'});
 
-console.log(user.comment.data);
+console.log(author.name); // JK Rowling
+
+author.name = 'Jason Mayer'
+console.log(author.name); // Jason Mayer
+
+author.reset();
+console.log(author.name) //  JK Rowling
 
 ```

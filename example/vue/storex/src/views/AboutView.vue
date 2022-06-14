@@ -36,6 +36,7 @@ export default {
   },
   methods: {
     onAddBook() {
+      console.log('valid', this.books.validateAll());
       this.bookModel.id = Math.random();
       this.books.push(this.bookModel);
       this.bookModel = new BookModel();

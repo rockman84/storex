@@ -21,7 +21,7 @@ export function hasOne (options:HasOneOptions) {
                 if (value instanceof options.modelClass) {
                     this._hasOne[property] = value;
                 }
-                throw `value not instance of model`;
+                throw new Error(`value not instance of model`);
             },
             get() {
                 if (opts.createModelWhenEmpty && !(property in this._hasOne)) {

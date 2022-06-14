@@ -31,8 +31,9 @@ test('Test Model',() => {
         // check old attributes
         expect(book.name = 'Demon Slayer').toEqual('Demon Slayer');
         expect(book.oldAttributes).toEqual({name: v.name});
-        expect(book.clearOldAttributes()).toBeUndefined();
+        expect(book.reset()).toBeUndefined();
         expect(book.oldAttributes).toEqual({});
+        expect(book.isDirtyAttribute).toBeFalsy();
 
         // check property
         expect(book.getAttribute('show')).toEqual(null);
@@ -68,7 +69,7 @@ test('Test Model',() => {
 
         // relation hasMany
         expect(author?.books).toBeInstanceOf(BookCollection);
-        expect(author?.books?.parent).toEqual(author);
+        //expect(author?.books?.parent).toEqual(author);
 
         // check validation
         //expect(book.validate()).toBeTruthy();
