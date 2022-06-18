@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es5",
+    "sourceMap": true,
+    "outDir": "./lib",
+    "strict": true,
+    "declaration": true,
+    "allowJs": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  },
+  "include": [
+    "__tests__",
+    "src",
+    "example"
+  ],
+  "exclude": [
+    "node_modules",
+    "example",
+    "**/__tests__/*"
+  ]
+}
