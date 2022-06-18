@@ -13,35 +13,59 @@ export class Collection extends BaseObject
         return this._parent;
     }
 
-    public get data()
+    /**
+     * get data item
+     */
+    public get data() : typeof Model[]
     {
         return this._data;
     }
 
-    public clearData()
+    /**
+     * clear all data item
+     */
+    public clearData() : void
     {
         this._data = [];
     }
 
+    /**
+     * count data items
+     */
     public get count()
     {
         return this._data.length;
     }
 
-    public push(item : typeof Model) : void
+    /**
+     * push item to data
+     * @param item
+     */
+    public async push(item : Model) : Promise<Model|null>
     {
-        this.beforePush(item).then((result) => {
-            result && this._data.push(item) && this.afterPush(item);
-        });
+        if (await this.beforePush(item)) {
+            this._data.push((item as any));
+            await this.afterPush(item);
+            return item;
+        }
+        return null;
     }
 
-    public async beforePush(item : typeof Model) : Promise<boolean>
+    /**
+     * event before push item to data
+     * @param item
+     */
+    public async beforePush(item : Model) : Promise<boolean>
     {
         this.emit(new Event(CollectionEvent.BEFORE_PUSH, this, item));
         return true;
     }
 
-    public afterPush(item : typeof Model) : void
+    /**
+     * event after push item to data
+     * @param item
+     */
+    public async afterPush(item : Model) : Promise<void>
     {
         this.emit(new Event(CollectionEvent.AFTER_PUSH, this, item));
         return;

@@ -49,6 +49,11 @@ export class Model extends BaseObject
         }
     }
 
+    /**
+     * add error message
+     * @param attribute
+     * @param message
+     */
     public addError(attribute: string, message : string) : void
     {
         if (!(attribute in this._errors)) {
@@ -57,6 +62,9 @@ export class Model extends BaseObject
         (this._errors as any)[attribute].push(message);
     }
 
+    /**
+     * get errors messages
+     */
     public get errors() : object
     {
         return this._errors;
@@ -101,7 +109,10 @@ export class Model extends BaseObject
         (this._attributes as any)[name] = value;
     }
 
-    public reset()
+    /**
+     * reset attributes value for old attributes then clear old attributes
+     */
+    public reset() : void
     {
         this.setAttributes(this._oldAttributes);
         this.clearOldAttributes();
@@ -147,6 +158,9 @@ export class Model extends BaseObject
         return this._attributes;
     }
 
+    /**
+     * check attributes is dirty
+     */
     get isDirtyAttribute() : boolean
     {
         return Object.entries(this._oldAttributes).length !== 0;
@@ -168,11 +182,17 @@ export class Model extends BaseObject
         this._oldAttributes = {};
     }
 
-    public rule() : object[]
+    /**
+     * set rule attributes
+     */
+    protected rule() : object[]
     {
         return [];
     }
 
+    /**
+     * validate attributes value
+     */
     public async validate() : Promise<boolean>
     {
         this.emit(new Event(ModelEvent.BEFORE_VALIDATE, this));

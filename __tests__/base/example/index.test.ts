@@ -72,16 +72,19 @@ test('Test Model',() => {
         //expect(author?.books?.parent).toEqual(author);
 
         // check validation
-        //expect(book.validate()).toBeTruthy();
+        // expect(book.validate()).toBeTruthy();
     });
 });
 
-test('Test Collection', () => {
+test('Test Collection', async () => {
     // Collection
     const newBooks = new BookCollection();
     expect(newBooks.parent).toBeUndefined();
     expect(newBooks.data).toEqual([]);
     expect(newBooks.count).toEqual(0);
+    const book = new BookModel();
+    await newBooks.push(book);
+    expect(newBooks.count).toEqual(1);
 
 })
 
