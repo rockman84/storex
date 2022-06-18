@@ -7,11 +7,6 @@ export class BaseObject {
      * @protected
      */
     protected _listeners : object = {};
-    /**
-     * state of new object
-     * @protected
-     */
-    protected _isNew : boolean = true;
 
     /**
      * get class name
@@ -58,6 +53,9 @@ export class BaseObject {
     }
 }
 
+/**
+ * Event of BaseObject
+ */
 export enum BaseObjectEvent {
     CHANGED_ATTRIBUTE = 'changedAttribute',
     BEFORE_LOAD = 'beforeLoad',

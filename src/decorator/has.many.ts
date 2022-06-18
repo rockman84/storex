@@ -14,9 +14,6 @@ export function hasMany(options?: HasManyOptions) {
         const defaultOptions = {collectionClass: Collection, attribute: null, targetAttribute: null};
         const opts = {...defaultOptions, ...options};
         const objectClass = opts.collectionClass;
-        if (objectClass instanceof Collection) {
-            throw new Error(`${objectClass.name} @hasMany should instance Collection`);
-        }
         Reflect.defineProperty(target, property, {
             enumerable: true,
             configurable: true,

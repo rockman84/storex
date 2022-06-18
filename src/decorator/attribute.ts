@@ -1,9 +1,12 @@
 import {BaseObject} from "../base/base.object";
 import "reflect-metadata";
 
+/**
+ * interface of attribute options
+ */
 export interface AttributeOptions {
     name: string;
-};
+}
 
 export function attribute(options? : AttributeOptions) {
     return (target: BaseObject, name: string) : void => {
