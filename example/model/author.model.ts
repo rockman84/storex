@@ -1,8 +1,9 @@
 import {Model} from "../../src";
 import {attribute, hasMany} from "../../src";
 import {BookCollection} from "./book.collection";
+import {ApiModel} from "../../src/ApiModel";
 
-export class AuthorModel extends Model
+export class AuthorModel extends ApiModel
 {
     @attribute()
     id? : string;

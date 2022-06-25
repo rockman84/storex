@@ -4,7 +4,6 @@ import {BookModel} from "../example/model/book.model";
 import {AuthorModel} from "../example/model/author.model";
 import {BookCollection} from "../example/model/book.collection";
 import {AuthorCollection} from "../example/model/author.collection";
-import {FetchTransport} from "../src/trasport/fetch.transport";
 
 test('Test Model',() => {
     const booksData = [

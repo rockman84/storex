@@ -5,26 +5,15 @@ import {AuthorModel} from "../example/model/author.model";
 
 
 test('Fetch', async () => {
-    const transport = new FetchTransport('http://api.iweb.dev.id:90/example/author/create');
-    // const request = transport.createRequest();
-    // const response = await fetch(request);
-    // expect(response.status).toEqual(200);
-
-    const book = new BookModel({
-        name: 'Harry Porter'
-    });
     const author = new AuthorModel({
-        name: 'Han',
+        name: 'Hansen Keren',
     });
-    const responseAuthor = await transport.create(author);
-    if (responseAuthor instanceof Response) {
-        console.log(responseAuthor.status);
-    }
+    let result = await author.save();
+    expect(result).toBeTruthy();
+    expect(author.errors).toEqual({});
+    expect(author.id).toBeDefined();
 
-
-    console.log('erros', author.errors);
-    console.log(author.getError('name')[0]);
-    console.log('old', author.oldAttributes);
-
-
+    author.name = 'Hans';
+    result = await author.save();
+    expect(result).toBeTruthy();
 });

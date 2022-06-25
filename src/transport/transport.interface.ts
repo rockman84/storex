@@ -1,8 +1,9 @@
 import {Model} from "../model";
 
 export interface TransportInterface {
-    // getOne() : Promise<any>;
-    create(model: Model) : Promise<Response|boolean>;
-    // update(model: Model) : Promise<any>;
-    // delete(model: Model) : Promise<any>;
+    createOne(model: Model, options?: object) : Promise<any>
+    updateOne(model: Model, options?: object) : Promise<any>
+    deleteOne(model: Model, options?: object) : Promise<any>
+    getOne(input: string) : Promise<any>
+    getMany(model: Model, requestOptions?: RequestInit) : Promise<any>
 }
