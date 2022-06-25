@@ -70,6 +70,11 @@ export class Model extends BaseObject
         return this._errors;
     }
 
+    public getError(name : string)
+    {
+        return (this._errors as any)[name];
+    }
+
     /**
      * load data to exist attributes
      * @param params
@@ -177,7 +182,7 @@ export class Model extends BaseObject
     /**
      * clear all old attributes
      */
-    protected clearOldAttributes() : void
+    public clearOldAttributes() : void
     {
         this._oldAttributes = {};
     }
