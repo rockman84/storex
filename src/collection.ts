@@ -8,6 +8,8 @@ export class Collection extends BaseObject
 
     private _data : typeof Model[] = [];
 
+    protected modelClass: typeof Model = Model;
+
     public get parent()
     {
         return this._parent;
@@ -19,6 +21,22 @@ export class Collection extends BaseObject
     public get data() : typeof Model[]
     {
         return this._data;
+    }
+
+    /**
+     * set new dataset item
+     * @param data
+     */
+    public set data(data : object[])
+    {
+        this.clearData();
+        data.forEach(async (value) => {
+            if (value instanceof this.modelClass) {
+                await this.push(value);
+            } else {
+                await this.push(new this.modelClass(value));
+            }
+        });
     }
 
     /**

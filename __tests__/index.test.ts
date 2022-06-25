@@ -1,9 +1,10 @@
-import {attribute} from "../../../src";
-import {ModelEvent} from "../../../src";
-import {BookModel} from "../../../example/model/book.model";
-import {AuthorModel} from "../../../example/model/author.model";
-import {BookCollection} from "../../../example/model/book.collection";
-import {AuthorCollection} from "../../../example/model/author.collection";
+import {attribute} from "../src";
+import {ModelEvent} from "../src";
+import {BookModel} from "../example/model/book.model";
+import {AuthorModel} from "../example/model/author.model";
+import {BookCollection} from "../example/model/book.collection";
+import {AuthorCollection} from "../example/model/author.collection";
+import {FetchTransport} from "../src/trasport/fetch.transport";
 
 test('Test Model',() => {
     const booksData = [
@@ -86,6 +87,13 @@ test('Test Collection', async () => {
     await newBooks.push(book);
     expect(newBooks.count).toEqual(1);
 
+    newBooks.data = [
+        {name: 'Harry Porter'},
+        {name: 'Dragon Ball'},
+        {name: 'Deamon Slayer'}
+    ];
+    // expect(newBooks.count).toEqual(3);
+
 })
 
 test('Test Decorator', () => {
@@ -93,3 +101,4 @@ test('Test Decorator', () => {
     // console.log(attr(new Model(), 'hansen'));
     expect(attribute() instanceof Function).toBeTruthy();
 });
+

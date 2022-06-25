@@ -24,7 +24,7 @@
     "dev": "npx ts-node example/index.ts",
     "testwatch": "TERM=dumb jest --config jestconfig.json --watch --cache=false",
     "test": "TERM=dumb jest --config jestconfig.json --cache=false ./example/index.test.ts",
-    "clear" : "jest --clearCache",
+    "clear": "jest --clearCache",
     "build": "tsc",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
     "lint": "tslint -p tsconfig.json"
@@ -36,7 +36,8 @@
     "ts-jest": "^28.0.2",
     "tslint": "^6.1.3",
     "tslint-config-prettier": "^1.18.0",
-    "typescript": "^4.6.4"
+    "typescript": "^4.6.4",
+    "cypress": "^10.2.0"
   },
   "dependencies": {
     "reflect-metadata": "^0.1.13"
