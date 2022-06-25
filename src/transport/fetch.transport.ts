@@ -67,7 +67,8 @@ export class FetchTransport extends BaseObject implements TransportInterface
         });
     }
 
-    async createOne(model: Model, requestOptions?: RequestInit): Promise<ResponseTransport> {
+    async createOne(model: Model, requestOptions?: RequestInit): Promise<ResponseTransport>
+    {
         const request = new Request(this._baseUrl + '/' + this.apiOptions.createOne?.path, {
             body: JSON.stringify(model.attributes),
             method: this.apiOptions.createOne?.method,
@@ -90,19 +91,23 @@ export class FetchTransport extends BaseObject implements TransportInterface
         );
     }
 
-    async deleteOne(model: Model, requestOptions?: RequestInit): Promise<any> {
+    async deleteOne(model: Model, requestOptions?: RequestInit): Promise<any>
+    {
         return Promise.resolve(undefined);
     }
 
-    async getMany(model: Model, requestOptions?: RequestInit): Promise<any> {
+    async getMany(model: Collection, requestOptions?: RequestInit): Promise<any>
+    {
         return Promise.resolve(undefined);
     }
 
-    async getOne(url: string): Promise<any> {
+    async getOne(url: string): Promise<any>
+    {
         return Promise.resolve(undefined);
     }
 
-    async updateOne(model: Model, requestOptions?: RequestInit): Promise<ResponseTransport> {
+    async updateOne(model: Model, requestOptions?: RequestInit): Promise<ResponseTransport>
+    {
         return new ResponseTransport(
             false,
             {}
