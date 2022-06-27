@@ -6,16 +6,18 @@ export interface TransportInterface {
     /**
      * create one base
      * @param model
+     * @param attributes
      * @param options
      */
-    createOne(model: Model, options?: object) : Promise<ResponseTransport>
+    createOne(model: Model, attributes: object, options?: object) : Promise<ResponseTransport>
 
     /**
      * update one base
      * @param model
+     * @param attributes
      * @param options
      */
-    updateOne(model: Model, options?: object) : Promise<ResponseTransport>
+    updateOne(model: Model, attributes: object, options?: object) : Promise<ResponseTransport>
 
     /**
      * delete one base
@@ -27,9 +29,10 @@ export interface TransportInterface {
     /**
      * get one
      * @param model
+     * @param query
      * @param options
      */
-    getOne(model: Model, options?: object) : Promise<ResponseTransport>
+    getOne(model: Model, query : object, options?: object) : Promise<ResponseTransport>
 
     /**
      * get Many

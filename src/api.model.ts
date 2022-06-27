@@ -11,14 +11,14 @@ export class ApiModel extends Model
     /**
      * action save to create or update data from attributes
      */
-    public async save() : Promise<ResponseTransport>
+    public async save(only? : string[], validate: boolean = true) : Promise<ResponseTransport>
     {
-        if (!(await this.validate()) || !(await this.beforeSave(this._isNew))) {
+        if (!(validate && await this.validate()) || !(await this.beforeSave(this._isNew))) {
             return new ResponseTransport(false, {});
         }
         const response = this._isNew ?
-            await this.transport.createOne(this) :
-            await this.transport.updateOne(this);
+            await this.transport.createOne(this, only ? this.getAttributesBy(only) : this.attributes) :
+            await this.transport.updateOne(this, only ? this.getAttributesBy(only) : this.attributes);
         if (response.success) {
             this._isNew = false;
             this.setAttributes(response.data);
@@ -82,7 +82,7 @@ export class ApiModel extends Model
         if (!(await this.beforeFind(query))) {
             return new ResponseTransport(false, {});
         }
-        const response = await this.transport.getOne(this);
+        const response = await this.transport.getOne(this, query);
         if (response.success) {
             this._isNew = false;
             this.clearOldAttributes();

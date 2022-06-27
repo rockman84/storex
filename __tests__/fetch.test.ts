@@ -8,7 +8,8 @@ test('Fetch', async () => {
     const author = new AuthorModel({
         name: 'Hansen Keren',
     });
-    let result = await author.save();
+    let result = await author.save(['id', 'name']);
+    console.log(author.errors);
     expect(result.success).toBeTruthy();
     expect(author.errors).toEqual({});
     expect(author.id).toBeDefined();
@@ -20,5 +21,6 @@ test('Fetch', async () => {
     console.log(author.errors);
     console.log(author.attributes);
 
-    const newAuthor = await author.find({});
+    const newAuthor = await AuthorModel.findOne({});
+    console.log(newAuthor);
 });

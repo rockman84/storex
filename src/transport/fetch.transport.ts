@@ -83,10 +83,10 @@ export class FetchTransport extends BaseObject implements TransportInterface
         return `${this._baseUrl}/${url}${queryParams}`;
     }
 
-    async createOne(model: Model, requestOptions?: RequestInit): Promise<ResponseTransport>
+    async createOne(model: Model, attributes : object, requestOptions?: RequestInit): Promise<ResponseTransport>
     {
         const request = new Request(this.createUrl(this.apiOptions.createOne?.path), {
-            body: JSON.stringify(model.attributes),
+            body: JSON.stringify(attributes),
             method: this.apiOptions.createOne?.method,
             headers: {
                 'Content-Type' : 'application/json'
@@ -98,14 +98,14 @@ export class FetchTransport extends BaseObject implements TransportInterface
         return await createResponseTransport(model, response);
     }
 
-    async updateOne(model: Model, requestOptions?: RequestInit): Promise<ResponseTransport>
+    async updateOne(model: Model, attributes: object, requestOptions?: RequestInit): Promise<ResponseTransport>
     {
         const url = this.createUrl(this.apiOptions.updateOne?.path, {
             id: model.getAttribute('id')
         });
 
         const request = new Request(url, {
-            body: JSON.stringify(model.attributes),
+            body: JSON.stringify(attributes),
             method: this.apiOptions.updateOne?.method,
             headers: {
                 'Content-Type' : 'application/json'
@@ -120,7 +120,10 @@ export class FetchTransport extends BaseObject implements TransportInterface
     async deleteOne(model: Model, requestOptions?: RequestInit): Promise<ResponseTransport>
     {
         const request = new Request(this.createUrl(this.apiOptions.deleteOne?.path),{
-            method: this.apiOptions.deleteOne?.method
+            method: this.apiOptions.deleteOne?.method,
+            headers: {
+                'Content-Type' : 'application/json'
+            },
         });
         const response = await fetch(request);
         return await createResponseTransport(model, response);
@@ -129,18 +132,32 @@ export class FetchTransport extends BaseObject implements TransportInterface
     async getMany(model: Collection, requestOptions?: RequestInit): Promise<ResponseTransport>
     {
         new URLSearchParams();
-        const request = new Request('', {...requestOptions});
+        const request = new Request(this.createUrl(this.apiOptions.getMany?.path), {
+            method: this.apiOptions.getMany?.method,
+            headers: {
+                'Content-Type' : 'application/json'
+            },
+            ...requestOptions
+        });
         const response = await fetch(request);
-        return new ResponseTransport(true, response);
+        const result = await response.json();
+        return new ResponseTransport(true, result);
     }
 
-    async getOne(model: Model, requestOptions?: RequestInit): Promise<ResponseTransport>
+    async getOne(model: Model, query : object, requestOptions?: RequestInit): Promise<ResponseTransport>
     {
-        const request = new Request(this.createUrl(this.apiOptions.getOne?.path));
+        const request = new Request(this.createUrl(this.apiOptions.getOne?.path, query), {
+            method: this.apiOptions.getOne?.method,
+            headers: {
+                'Content-Type' : 'application/json'
+            },
+            ...requestOptions,
+        });
         const response = await fetch(request);
+        const result = await response.json();
         return new ResponseTransport(
             response.status === 200,
-            response.json(),
+            result,
         );
     }
 }
