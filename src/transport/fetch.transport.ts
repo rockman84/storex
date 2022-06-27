@@ -7,7 +7,7 @@ import {ResponseTransport} from "./response.transport";
 export interface ErrorValidation {
     field: string;
     message: string;
-};
+}
 
 export interface ApiParamsOptions {
     method: string;
@@ -22,15 +22,23 @@ export interface ApiOptions {
     getMany?: ApiParamsOptions;
 }
 
-export const ModelAction = async (response : Response, model : Model) => {
-
+export const createResponseTransport = async (model: Model, response: Response) : Promise<ResponseTransport> =>
+{
+    const result = await response.json();
+    if (response.status === 422) {
+        result.forEach((error: ErrorValidation) => {
+            model.addError(error.field, error.message);
+        });
+    }
+    return new ResponseTransport(
+        response.status === 200 || response.status === 201,
+        result
+    );
 }
 
 export class FetchTransport extends BaseObject implements TransportInterface
 {
     private readonly _baseUrl : string;
-
-    private _result : object[] = [];
 
     public apiOptions : ApiOptions = {
         createOne: {
@@ -38,7 +46,7 @@ export class FetchTransport extends BaseObject implements TransportInterface
             path: 'create',
         },
         updateOne: {
-            method: 'post',
+            method: 'put',
             path: 'update',
         },
         deleteOne: {
@@ -60,16 +68,21 @@ export class FetchTransport extends BaseObject implements TransportInterface
         this._baseUrl = baseUrl;
     }
 
-    public setErrorValidation(model: Model, result : ErrorValidation[]) : void
+    public createUrl(url: string | undefined, params : object = {}) : string
     {
-        result.forEach((error: ErrorValidation) => {
-            model.addError(error.field, error.message);
-        });
+        if (typeof url === 'undefined') {
+            throw new Error('Not Supported Url');
+        }
+        let queryParams = '';
+        if (params) {
+            queryParams = '?' + (new URLSearchParams((params as any))).toString();
+        }
+        return `${this._baseUrl}/${url}${queryParams}`;
     }
 
     async createOne(model: Model, requestOptions?: RequestInit): Promise<ResponseTransport>
     {
-        const request = new Request(this._baseUrl + '/' + this.apiOptions.createOne?.path, {
+        const request = new Request(this.createUrl(this.apiOptions.createOne?.path), {
             body: JSON.stringify(model.attributes),
             method: this.apiOptions.createOne?.method,
             headers: {
@@ -79,38 +92,52 @@ export class FetchTransport extends BaseObject implements TransportInterface
         });
 
         const response = await fetch (request);
-        const result = await response.json();
-        if (response.status === 422) {
-            result.forEach((error: ErrorValidation) => {
-                model.addError(error.field, error.message);
-            });
-        }
-        return new ResponseTransport(
-            response.status === 200 || response.status === 201,
-            result
-        );
-    }
-
-    async deleteOne(model: Model, requestOptions?: RequestInit): Promise<any>
-    {
-        return Promise.resolve(undefined);
-    }
-
-    async getMany(model: Collection, requestOptions?: RequestInit): Promise<any>
-    {
-        return Promise.resolve(undefined);
-    }
-
-    async getOne(url: string): Promise<any>
-    {
-        return Promise.resolve(undefined);
+        return await createResponseTransport(model, response);
     }
 
     async updateOne(model: Model, requestOptions?: RequestInit): Promise<ResponseTransport>
     {
+        const url = this.createUrl(this.apiOptions.updateOne?.path, {
+            id: model.getAttribute('id')
+        });
+
+        const request = new Request(url, {
+            body: JSON.stringify(model.attributes),
+            method: this.apiOptions.updateOne?.method,
+            headers: {
+                'Content-Type' : 'application/json'
+            },
+            ...requestOptions
+        });
+
+        const response = await fetch (request);
+        return await createResponseTransport(model, response);
+    }
+
+    async deleteOne(model: Model, requestOptions?: RequestInit): Promise<ResponseTransport>
+    {
+        const request = new Request(this.createUrl(this.apiOptions.deleteOne?.path),{
+            method: this.apiOptions.deleteOne?.method
+        });
+        const response = await fetch(request);
+        return await createResponseTransport(model, response);
+    }
+
+    async getMany(model: Collection, requestOptions?: RequestInit): Promise<ResponseTransport>
+    {
+        new URLSearchParams();
+        const request = new Request('', {...requestOptions});
+        const response = await fetch(request);
+        return new ResponseTransport(true, response);
+    }
+
+    async getOne(model: Model, requestOptions?: RequestInit): Promise<ResponseTransport>
+    {
+        const request = new Request(this.createUrl(this.apiOptions.getOne?.path));
+        const response = await fetch(request);
         return new ResponseTransport(
-            false,
-            {}
+            response.status === 200,
+            response.json(),
         );
     }
 }

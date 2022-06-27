@@ -9,11 +9,16 @@ test('Fetch', async () => {
         name: 'Hansen Keren',
     });
     let result = await author.save();
-    expect(result).toBeTruthy();
+    expect(result.success).toBeTruthy();
     expect(author.errors).toEqual({});
     expect(author.id).toBeDefined();
 
-    author.name = 'Hans';
+    author.name = 'Hans asasas';
+
     result = await author.save();
-    expect(result).toBeTruthy();
+    expect(result.success).toBeTruthy();
+    console.log(author.errors);
+    console.log(author.attributes);
+    const url = new URLSearchParams((author.attributes as any));
+    console.log(url.toString());
 });
