@@ -2,6 +2,7 @@ import {FetchTransport} from "../src/transport/fetch.transport";
 import 'isomorphic-fetch';
 import {BookModel} from "../example/model/book.model";
 import {AuthorModel} from "../example/model/author.model";
+import {AuthorCollection} from "../example/model/author.collection";
 
 
 test('Fetch', async () => {
@@ -22,5 +23,9 @@ test('Fetch', async () => {
     console.log(author.attributes);
 
     const newAuthor = await AuthorModel.findOne({});
-    console.log(newAuthor);
+    console.log(newAuthor.attributes);
+
+    const authors = await AuthorCollection.findAll();
+    console.log(authors.data[0]);
+
 });

@@ -11,11 +11,17 @@ export class ApiCollection extends Collection
     public async findAll(query?: object) : Promise<ResponseTransport>
     {
         const response = await this.transport.getMany(this);
+        console.log(response.data);
         if (response.success) {
-            (response.data as object[]).forEach((item, index) => {
-                this.push(new ApiModel(item));
-            });
+            this.data = (response.data as object[]);
         }
         return response;
+    }
+
+    public static async findAll(query?: object)
+    {
+        const collection = new this();
+        await collection.findAll(query);
+        return collection;
     }
 }
