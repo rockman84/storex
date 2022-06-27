@@ -13,12 +13,12 @@ test('Fetch', async () => {
     expect(author.errors).toEqual({});
     expect(author.id).toBeDefined();
 
-    author.name = 'Hans asasas';
+    author.name = 'Hans';
 
     result = await author.save();
-    expect(result.success).toBeTruthy();
+    expect(result.success).toBeFalsy();
     console.log(author.errors);
     console.log(author.attributes);
-    const url = new URLSearchParams((author.attributes as any));
-    console.log(url.toString());
+
+    const newAuthor = await author.find({});
 });

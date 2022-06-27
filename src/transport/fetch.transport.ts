@@ -63,9 +63,12 @@ export class FetchTransport extends BaseObject implements TransportInterface
         },
     };
 
-    constructor(baseUrl: string) {
+    constructor(baseUrl: string, apiOptions? : ApiOptions) {
         super();
         this._baseUrl = baseUrl;
+        if (typeof apiOptions !== 'undefined') {
+            this.apiOptions = {...apiOptions};
+        }
     }
 
     public createUrl(url: string | undefined, params : object = {}) : string

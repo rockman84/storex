@@ -156,6 +156,22 @@ export class Model extends BaseObject
     }
 
     /**
+     * get attributes by name
+     * @param only
+     */
+    public getAttributesBy(only: string[]) : object
+    {
+        let result = {};
+        only.forEach((key) => {
+            if (this.hasAttribute(key)) {
+                const value = this.getAttribute(key);
+                (result as any)[key] = value;
+            }
+        });
+        return result;
+    }
+
+    /**
      * get all attributes key and value
      */
     public get attributes() : object
