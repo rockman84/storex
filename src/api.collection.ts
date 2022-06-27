@@ -6,6 +6,8 @@ import {ApiModel} from "./api.model";
 
 export class ApiCollection extends Collection
 {
+    protected modelClass : typeof ApiModel = ApiModel;
+
     public transport : TransportInterface = new FetchTransport('http://api.iweb.dev.id:90/example/author');
 
     public async findAll(query?: object) : Promise<ResponseTransport>

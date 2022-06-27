@@ -77,7 +77,7 @@ export class ApiModel extends Model
         this.emit(new Event(ApiModelEvent.AFTER_DELETE, this));
     }
 
-    public async find(query : object) : Promise<ResponseTransport>
+    public async findOne(query : object) : Promise<ResponseTransport>
     {
         if (!(await this.beforeFind(query))) {
             return new ResponseTransport(false, {});
@@ -106,7 +106,7 @@ export class ApiModel extends Model
     public static async findOne(query: object)
     {
         const model = new this();
-        await model.find(query);
+        await model.findOne(query);
         return model;
     }
 }
