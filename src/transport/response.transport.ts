@@ -4,8 +4,9 @@ export class ResponseTransport {
     public protocol: any;
     public error: any;
 
-    constructor(success : boolean, data : object) {
+    constructor(success : boolean, data : object, protocol? : any) {
         this.success = success;
         this.data = data;
+        this.protocol = protocol;
     }
 }

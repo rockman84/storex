@@ -25,7 +25,7 @@ test('Fetch', async () => {
     const newAuthor = await AuthorModel.findOne({});
     console.log(newAuthor.attributes);
 
-    const authors = await AuthorCollection.findAll();
-    console.log(authors.data[0]);
+    const authors = await AuthorCollection.findAll({page:7});
+    console.log(authors.pagination);
 
 });

@@ -3,6 +3,7 @@ import {BaseObject} from "../base/base.object";
 import {Model} from "../model";
 import {Collection} from "../collection";
 import {ResponseTransport} from "./response.transport";
+import {ApiCollection} from "../api.collection";
 
 export interface ErrorValidation {
     field: string;
@@ -129,10 +130,10 @@ export class FetchTransport extends BaseObject implements TransportInterface
         return await createResponseTransport(model, response);
     }
 
-    async getMany(model: Collection, requestOptions?: RequestInit): Promise<ResponseTransport>
+    async getMany(collection: ApiCollection, query?: object, requestOptions?: RequestInit): Promise<ResponseTransport>
     {
         new URLSearchParams();
-        const request = new Request(this.createUrl(this.apiOptions.getMany?.path), {
+        const request = new Request(this.createUrl(this.apiOptions.getMany?.path, query), {
             method: this.apiOptions.getMany?.method,
             headers: {
                 'Content-Type' : 'application/json'
@@ -141,7 +142,14 @@ export class FetchTransport extends BaseObject implements TransportInterface
         });
         const response = await fetch(request);
         const result = await response.json();
-        return new ResponseTransport(true, result);
+        const success = response.status === 200 || response.status == 201;
+        if (success) {
+            collection.pagination.totalCount = parseInt(response.headers.get('X-Pagination-Total-Count') as any);
+            collection.pagination.totalPage = parseInt(response.headers.get('X-Pagination-Page-Count') as any);
+            collection.pagination.currentPage = parseInt(response.headers.get('X-Pagination-Current-Page') as any);
+            collection.pagination.pageSize = parseInt(response.headers.get('X-Pagination-Per-Page') as any);
+        }
+        return new ResponseTransport(success, result, response);
     }
 
     async getOne(model: Model, query : object, requestOptions?: RequestInit): Promise<ResponseTransport>

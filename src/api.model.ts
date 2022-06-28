@@ -59,9 +59,10 @@ export class ApiModel extends Model
         }
         const response = await this.transport.deleteOne(this);
         if (response.success) {
+            this._isNew = true;
+            await this.afterDelete();
             this.clearOldAttributes();
             this._attributes = {};
-            await this.afterDelete();
         }
         return response;
     }
