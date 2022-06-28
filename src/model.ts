@@ -70,6 +70,11 @@ export class Model extends BaseObject
         return this._errors;
     }
 
+    public getError(name : string)
+    {
+        return (this._errors as any)[name];
+    }
+
     /**
      * load data to exist attributes
      * @param params
@@ -151,6 +156,22 @@ export class Model extends BaseObject
     }
 
     /**
+     * get attributes by name
+     * @param only
+     */
+    public getAttributesBy(only: string[]) : object
+    {
+        let result = {};
+        only.forEach((key) => {
+            if (this.hasAttribute(key)) {
+                const value = this.getAttribute(key);
+                (result as any)[key] = value;
+            }
+        });
+        return result;
+    }
+
+    /**
      * get all attributes key and value
      */
     public get attributes() : object
@@ -177,7 +198,7 @@ export class Model extends BaseObject
     /**
      * clear all old attributes
      */
-    protected clearOldAttributes() : void
+    public clearOldAttributes() : void
     {
         this._oldAttributes = {};
     }

@@ -1,6 +1,6 @@
 {
   "name": "@sky-js/storex",
-  "version": "2.0.0-alpha-6",
+  "version": "2.0.0-alpha-7",
   "author": "Hansen Wong",
   "repository": {
     "type": "git",
@@ -24,13 +24,14 @@
     "dev": "npx ts-node example/index.ts",
     "testwatch": "TERM=dumb jest --config jestconfig.json --watch --cache=false",
     "test": "TERM=dumb jest --config jestconfig.json --cache=false ./example/index.test.ts",
-    "clear" : "jest --clearCache",
+    "clear": "jest --clearCache",
     "build": "tsc",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
     "lint": "tslint -p tsconfig.json"
   },
   "devDependencies": {
     "@types/jest": "^27.5.1",
+    "cypress": "^10.2.0",
     "jest": "^28.1.0",
     "prettier": "^2.6.2",
     "ts-jest": "^28.0.2",
@@ -39,6 +40,7 @@
     "typescript": "^4.6.4"
   },
   "dependencies": {
+    "isomorphic-fetch": "^3.0.0",
     "reflect-metadata": "^0.1.13"
   }
 }
