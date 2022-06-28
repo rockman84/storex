@@ -26,6 +26,7 @@ test('Fetch', async () => {
     console.log(newAuthor.attributes);
 
     const authors = await AuthorCollection.findAll({page:7});
+    expect(authors.count).toEqual(authors.pagination.pageSize);
     console.log(authors.pagination);
 
 });
