@@ -6,19 +6,21 @@ import {FetchTransport} from "./transport/fetch.transport";
 
 export class ApiModel extends Model
 {
+    protected _isNew : boolean = true;
+
     protected transport : TransportInterface = new FetchTransport('http://localhost');
 
     /**
      * action save to create or update data from attributes
      */
-    public async save(only? : string[], validate: boolean = true) : Promise<ResponseTransport>
+    public async save(only? : string[], query?: object, validate: boolean = true) : Promise<ResponseTransport>
     {
         if (!(validate && await this.validate()) || !(await this.beforeSave(this._isNew))) {
             return new ResponseTransport(false, {});
         }
         const response = this._isNew ?
             await this.transport.createOne(this, only ? this.getAttributesBy(only) : this.attributes) :
-            await this.transport.updateOne(this, only ? this.getAttributesBy(only) : this.attributes);
+            await this.transport.updateOne(this, only ? this.getAttributesBy(only) : this.attributes, {...query, ...this.getAttributesBy(['id'])});
         if (response.success) {
             this._isNew = false;
             this.setAttributes(response.data);
@@ -60,24 +62,36 @@ export class ApiModel extends Model
         const response = await this.transport.deleteOne(this);
         if (response.success) {
             this._isNew = true;
-            await this.afterDelete();
+            await this.afterDelete(response);
             this.clearOldAttributes();
             this._attributes = {};
         }
         return response;
     }
 
+    /**
+     * event before delete
+     * @protected
+     */
     protected async beforeDelete() : Promise<boolean>
     {
         this.emit(new Event(ApiModelEvent.BEFORE_DELETE, this));
         return true;
     }
 
-    protected async afterDelete() : Promise<void>
+    /**
+     * event after delete
+     * @protected
+     */
+    protected async afterDelete(response : ResponseTransport) : Promise<void>
     {
-        this.emit(new Event(ApiModelEvent.AFTER_DELETE, this));
+        this.emit(new Event(ApiModelEvent.AFTER_DELETE, this, response));
     }
 
+    /**
+     * find single data
+     * @param query
+     */
     public async findOne(query : object) : Promise<ResponseTransport>
     {
         if (!(await this.beforeFind(query))) {

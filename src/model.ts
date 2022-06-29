@@ -34,8 +34,6 @@ export class Model extends BaseObject
      */
     protected _errors : object = {};
 
-    protected _isNew : boolean = true;
-
     /**
      * constructor
      * @param args

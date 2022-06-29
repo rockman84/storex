@@ -6,6 +6,12 @@ import {AuthorCollection} from "../example/model/author.collection";
 
 
 test('Fetch', async () => {
+
+    // fetch transport components
+    const fetch = new FetchTransport('http://localhost');
+    const url = fetch.createUrl('author/{id}/{name}', {id:123, name: 'harry', status: true, type: 'book'})
+    expect(url).toEqual('http://localhost/author/123/harry?status=true&type=book');
+
     const author = new AuthorModel({
         name: 'Hansen Keren',
     });
@@ -22,8 +28,9 @@ test('Fetch', async () => {
     console.log(author.errors);
     console.log(author.attributes);
 
-    const newAuthor = await AuthorModel.findOne({});
-    console.log(newAuthor.attributes);
+    const newAuthor = await AuthorModel.findOne({id: '00bd0e94-f4c0-11ec-9295-0242ac140002'});
+
+    console.log('findOne', newAuthor.attributes);
 
     const authors = await AuthorCollection.findAll({page:7});
     expect(authors.count).toEqual(authors.pagination.pageSize);
