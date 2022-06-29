@@ -2,17 +2,16 @@ import {Model} from "../model";
 import {Collection} from "../collection";
 
 export interface HasManyOptions {
-    collectionClass?: typeof Collection;
-    attribute? : string;
-    targetAttribute?: string;
+    collectionClass: typeof Collection;
+    attribute : string;
+    targetAttribute: string;
 }
 /**
  * decorator has many property
  */
 export function hasMany(options?: HasManyOptions) {
     return (target: Model, property: string) => {
-        const defaultOptions = {collectionClass: Collection, attribute: null, targetAttribute: null};
-        const opts = {...defaultOptions, ...options};
+        const opts = {collectionClass: Collection, ...options};
         const objectClass = opts.collectionClass;
         Reflect.defineProperty(target, property, {
             enumerable: true,
@@ -24,7 +23,8 @@ export function hasMany(options?: HasManyOptions) {
             },
             get() {
                 if (!(property in Object.keys(this._hasMany))) {
-                    const collection = new (objectClass as any)();
+                    console.log(opts.collectionClass);
+                    const collection = new (opts.collectionClass as any)();
                     // collection._parent = this;
                     this._hasMany[property] = collection;
                 }

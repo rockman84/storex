@@ -1,5 +1,5 @@
 import {Collection} from "./collection";
-import {ResponseTransport} from "./transport/response.transport";
+import {Action, ResponseTransport} from "./transport/response.transport";
 import {FetchTransport} from "./transport/fetch.transport";
 import {TransportInterface} from "./transport/transport.interface";
 import {ApiModel} from "./api.model";
@@ -23,7 +23,7 @@ export class ApiCollection extends Collection
         pageSize: 20,
     };
 
-    public transport : TransportInterface = new FetchTransport('http://api.iweb.dev.id:90/example/author');
+    public transport : TransportInterface = new FetchTransport('http://localhost');
 
     public async beforeFind() : Promise<boolean>
     {
@@ -39,7 +39,7 @@ export class ApiCollection extends Collection
     public async findAll(query?: object) : Promise<ResponseTransport>
     {
         if (!(await this.beforeFind())) {
-            return new ResponseTransport(false, (query as any));
+            return new ResponseTransport(Action.GET_MANY, false, (query as any));
         }
         const response = await this.transport.getMany(this, query);
         if (response.success) {

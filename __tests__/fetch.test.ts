@@ -1,39 +1,42 @@
 import {FetchTransport} from "../src/transport/fetch.transport";
 import 'isomorphic-fetch';
-import {BookModel} from "../example/model/book.model";
-import {AuthorModel} from "../example/model/author.model";
-import {AuthorCollection} from "../example/model/author.collection";
-
+import {AuthorModel, AuthorCollection} from "../example/model/author.model";
 
 test('Fetch', async () => {
 
     // fetch transport components
     const fetch = new FetchTransport('http://localhost');
-    const url = fetch.createUrl('author/{id}/{name}', {id:123, name: 'harry', status: true, type: 'book'})
+    const url = fetch.createUrl('author/{id}/{first_name}', {id:123, first_name: 'harry', status: true, type: 'book'})
     expect(url).toEqual('http://localhost/author/123/harry?status=true&type=book');
 
     const author = new AuthorModel({
-        name: 'Hansen Keren',
+        name: 'JK Rowling',
     });
+
+    // save
     let result = await author.save(['id', 'name']);
-    console.log(author.errors);
     expect(result.success).toBeTruthy();
     expect(author.errors).toEqual({});
     expect(author.id).toBeDefined();
 
-    author.name = 'Hans';
-
+    // update
+    author.name = 'JK';
     result = await author.save();
     expect(result.success).toBeFalsy();
-    console.log(author.errors);
-    console.log(author.attributes);
+    author.name = 'Johnny Deep';
+    result = await author.save();
+    expect(result).toBeTruthy();
 
-    const newAuthor = await AuthorModel.findOne({id: '00bd0e94-f4c0-11ec-9295-0242ac140002'});
 
-    console.log('findOne', newAuthor.attributes);
+    // find one
+    const newAuthor = await AuthorModel.findOne(author.getAttributesBy(['id']));
 
-    const authors = await AuthorCollection.findAll({page:7});
+    // find all
+    const authors = await AuthorCollection.findAll({page:4});
     expect(authors.count).toEqual(authors.pagination.pageSize);
-    console.log(authors.pagination);
+
+    // delete
+    const resultDelete = await newAuthor.delete();
+    expect(resultDelete.success).toBeTruthy();
 
 });

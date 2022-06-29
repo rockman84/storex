@@ -1,6 +1,6 @@
 import {Model} from "./model";
 import {TransportInterface} from "./transport/transport.interface";
-import {ResponseTransport} from "./transport/response.transport";
+import {Action, ResponseTransport} from "./transport/response.transport";
 import {Event} from "./base/event";
 import {FetchTransport} from "./transport/fetch.transport";
 
@@ -16,7 +16,10 @@ export class ApiModel extends Model
     public async save(only? : string[], query?: object, validate: boolean = true) : Promise<ResponseTransport>
     {
         if (!(validate && await this.validate()) || !(await this.beforeSave(this._isNew))) {
-            return new ResponseTransport(false, {});
+            return new ResponseTransport(
+                this._isNew ? Action.CREATE_ONE : Action.UPDATE_ONE,
+                false, {}
+            );
         }
         const response = this._isNew ?
             await this.transport.createOne(this, only ? this.getAttributesBy(only) : this.attributes) :
@@ -56,10 +59,10 @@ export class ApiModel extends Model
      */
     public async delete() : Promise<ResponseTransport>
     {
-        if (!(await this.beforeDelete())) {
-            return new ResponseTransport(false, {});
+        if (this._isNew || !(await this.beforeDelete())) {
+            return new ResponseTransport(Action.DELETE_ONE, false, {});
         }
-        const response = await this.transport.deleteOne(this);
+        const response = await this.transport.deleteOne(this, this.getAttributesBy(['id']));
         if (response.success) {
             this._isNew = true;
             await this.afterDelete(response);
@@ -95,7 +98,7 @@ export class ApiModel extends Model
     public async findOne(query : object) : Promise<ResponseTransport>
     {
         if (!(await this.beforeFind(query))) {
-            return new ResponseTransport(false, {});
+            return new ResponseTransport(Action.GET_ONE, false, {});
         }
         const response = await this.transport.getOne(this, query);
         if (response.success) {
