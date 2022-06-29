@@ -1,5 +1,5 @@
 import {ApiCollection, attribute, hasMany} from "../../src";
-import {BookModel, BookCollection} from "./book.model";
+import {BookCollection} from "./book.model";
 import {ApiModel} from "../../src";
 import {FetchTransport} from "../../src/transport/fetch.transport";
 

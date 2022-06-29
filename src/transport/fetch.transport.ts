@@ -4,16 +4,36 @@ import {Action, ResponseTransport} from "./response.transport";
 import {ApiCollection} from "../api.collection";
 import {ApiModel} from "../api.model";
 
+/**
+ * Interface of response of errors
+ */
 export interface ErrorValidation {
+    /**
+     * field or attribute name
+     */
     field: string;
+
+    /**
+     * error message
+     */
     message: string;
 }
 
 export interface ApiParamsOptions {
+    /**
+     * method name eg. post, get, put, patch, delete, etc
+     */
     method: string;
+
+    /**
+     * sub path of url eg. update/{id}
+     */
     path: string;
 }
 
+/**
+ * interface Fetch Transport of Api Options
+ */
 export interface ApiOptions {
     createOne?: ApiParamsOptions;
     updateOne?: ApiParamsOptions;
@@ -22,6 +42,12 @@ export interface ApiOptions {
     getMany?: ApiParamsOptions;
 }
 
+/**
+ * Create response Transport
+ * @param action
+ * @param model
+ * @param response
+ */
 export const createResponseTransport = async (action : Action , model: ApiModel, response: Response) : Promise<ResponseTransport> =>
 {
     const result = (response.status !== 204) ? await response.json() : {};
@@ -40,8 +66,15 @@ export const createResponseTransport = async (action : Action , model: ApiModel,
 
 export class FetchTransport extends BaseObject implements TransportInterface
 {
+    /**
+     * base endpoint of api url
+     * @private
+     */
     private readonly _baseUrl : string;
 
+    /**
+     * configuration of api options actions
+     */
     public apiOptions : ApiOptions = {
         createOne: {
             method: 'post',
@@ -73,6 +106,11 @@ export class FetchTransport extends BaseObject implements TransportInterface
         }
     }
 
+    /**
+     * creating absolute url endpoint
+     * @param url
+     * @param params
+     */
     public createUrl(url: string | undefined, params : object = {}) : string
     {
         if (typeof url === 'undefined') {
