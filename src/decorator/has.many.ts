@@ -23,7 +23,6 @@ export function hasMany(options?: HasManyOptions) {
             },
             get() {
                 if (!(property in Object.keys(this._hasMany))) {
-                    console.log(opts.collectionClass);
                     const collection = new (opts.collectionClass as any)();
                     // collection._parent = this;
                     this._hasMany[property] = collection;

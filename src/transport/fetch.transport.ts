@@ -141,7 +141,6 @@ export class FetchTransport extends BaseObject implements TransportInterface
 
     async getMany(collection: ApiCollection, query?: object, requestOptions?: RequestInit): Promise<ResponseTransport>
     {
-        new URLSearchParams();
         const request = new Request(this.createUrl(this.apiOptions.getMany?.path, query), {
             method: this.apiOptions.getMany?.method,
             headers: {
@@ -151,12 +150,12 @@ export class FetchTransport extends BaseObject implements TransportInterface
         });
         const response = await fetch(request);
         const result = await response.json();
-        const success = response.status === 200 || response.status == 201;
+        const success = response.status === 200 || response.status === 201;
         if (success) {
-            collection.pagination.totalCount = parseInt(response.headers.get('X-Pagination-Total-Count') as any);
-            collection.pagination.totalPage = parseInt(response.headers.get('X-Pagination-Page-Count') as any);
-            collection.pagination.currentPage = parseInt(response.headers.get('X-Pagination-Current-Page') as any);
-            collection.pagination.pageSize = parseInt(response.headers.get('X-Pagination-Per-Page') as any);
+            collection.pagination.totalCount = parseInt(response.headers.get('X-Pagination-Total-Count') as any, 10);
+            collection.pagination.totalPage = parseInt(response.headers.get('X-Pagination-Page-Count') as any, 10);
+            collection.pagination.currentPage = parseInt(response.headers.get('X-Pagination-Current-Page') as any, 10);
+            collection.pagination.pageSize = parseInt(response.headers.get('X-Pagination-Per-Page') as any, 10);
         }
         return new ResponseTransport(Action.GET_MANY, success, result, response);
     }

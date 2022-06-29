@@ -40,7 +40,7 @@ export class ApiModel extends Model
      */
     protected async beforeSave(insert : boolean) : Promise<boolean>
     {
-        this.emit(new Event(ApiModelEvent.BEFORE_SAVE, this, {insert: insert}));
+        this.emit(new Event(ApiModelEvent.BEFORE_SAVE, this, {insert}));
         return true;
     }
 
@@ -51,7 +51,7 @@ export class ApiModel extends Model
      */
     protected async afterSave(oldAttributes : object) : Promise<void>
     {
-        this.emit(new Event(ApiModelEvent.AFTER_SAVE, this, {oldAttributes: oldAttributes}));
+        this.emit(new Event(ApiModelEvent.AFTER_SAVE, this, {oldAttributes}));
     }
 
     /**

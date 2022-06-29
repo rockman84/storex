@@ -159,7 +159,7 @@ export class Model extends BaseObject
      */
     public getAttributesBy(only: string[]) : object
     {
-        let result = {};
+        const result = {};
         only.forEach((key) => {
             if (this.hasAttribute(key)) {
                 const value = this.getAttribute(key);
