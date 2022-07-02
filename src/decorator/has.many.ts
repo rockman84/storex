@@ -1,11 +1,14 @@
 import {Model} from "../model";
 import {Collection} from "../collection";
 import {getOrCreateMeta} from "./meta.entity";
+import {FetchTransport} from "../transport/fetch.transport";
+import {ApiModel} from "../api.model";
 
 export interface HasManyOptions {
     collection: any;
     attribute : string;
     targetAttribute: string;
+    autoLoad?: boolean;
 }
 
 /**
@@ -33,7 +36,13 @@ export function hasMany(options?: HasManyOptions) {
 
             },
             get() {
-                return this._hasMany[property];
+                const collection = this._hasMany[property];
+                if (options?.autoLoad && this.transport instanceof FetchTransport && opts.targetAttribute) {
+                    const query : object = [];
+                    (query as any)[opts.targetAttribute] = this.getAttribute(opts.attribute)
+                    collection.findAll(query);
+                }
+                return collection;
             }
         });
     }

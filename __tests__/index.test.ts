@@ -8,24 +8,26 @@ import {entities} from "../src/decorator/meta.entity";
 test('check property', async () => {
     const data = {
         id: 123,
-        name: 'Halllo',
+        name: 'Author Name',
         books: [
             {
-                id: 234,
-                name: 'Book name ss',
+                id: 1,
+                name: 'Book 1',
+            },
+            {
+                id: 2,
+                name: 'Book 2'
             }
         ]
     };
     const author = new AuthorModel(data);
-    author.name = 'hansen s';
+    expect(author.id).toEqual(123);
+    expect(author.name).toEqual('Author Name');
+    expect(author.books).toBeInstanceOf(BookCollection);
+    await author.books?.data;
+    expect(author.books?.count).toEqual(2);
 
-
-    const author2 = new AuthorModel();
-
-    // console.log(entities);
-    // console.log(author.hasAttribute('id'));
-    // console.log(author.attributes);
-    // console.log(author.name);
+    console.log(entities);
 });
 
 test('Test Model',() => {

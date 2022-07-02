@@ -9,7 +9,7 @@ export class BookModel extends ApiModel
 {
     transport = transport;
 
-    @attribute()
+    @attribute({isIndex: true})
     public id? : number;
 
     @attribute()

@@ -3,17 +3,18 @@ interface MetaEntityObject {
     attributes: string[],
     hasMany: string[],
     hasOne: string[],
+    index: string[],
 };
 
 export const entities : MetaEntityObject[] = [];
 
 export const getOrCreateMeta = (className : string) : MetaEntityObject =>
 {
-    let meta = entities.find((meta) => meta.className == className);
+    let meta = entities.find((item) => item.className === className);
     if (typeof meta !== 'undefined') {
         return meta;
     };
-    meta = {className: className, attributes: [], hasMany: [], hasOne: []};
+    meta = {className, attributes: [], hasMany: [], hasOne: [], index: []};
     entities.push(meta);
     return meta;
 }

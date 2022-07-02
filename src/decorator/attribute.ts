@@ -18,6 +18,9 @@ export const attribute = (options? : AttributeOptions) => {
         if (!meta.attributes.includes(name)) {
             meta.attributes.push(name);
         }
+        if (opts.isIndex && !meta.index.includes(name)) {
+            meta.index.push(name);
+        }
         Reflect.defineProperty( target, name, {
             enumerable: true,
             configurable: true,
