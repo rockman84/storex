@@ -1,6 +1,7 @@
 import {BaseObject, BaseObjectEvent} from "./base/base.object";
 import {Collection} from "./collection";
 import {Event} from "./base/event";
+import {getOrCreateMeta} from "./decorator/meta.entity";
 
 export class Model extends BaseObject
 {
@@ -33,8 +34,6 @@ export class Model extends BaseObject
      * @protected
      */
     protected _errors : object = {};
-
-    protected _isNew : boolean = true;
 
     /**
      * constructor
@@ -104,14 +103,25 @@ export class Model extends BaseObject
      */
     public setAttribute(name : string, value : any) : void
     {
-        if (this.hasAttribute(name)) {
+        const meta = getOrCreateMeta(this.className);
+        if (meta.hasOne.includes(name)) {
+            const model : Model = (this._hasOne as any)[name];
+            model.setAttributes(value);
+        } else if ((name in this._hasMany)) {
+            const collection : Collection = (this._hasMany as any)[name];
+            collection.data = value;
+        } else if (meta.attributes.includes(name)) {
             const oldValue = this.getAttribute(name);
-            if ((typeof (this._oldAttributes as any)[name] === 'undefined') && oldValue !== value) {
-                (this._oldAttributes as any)[name] = this.getAttribute(name);
+            if (
+                (typeof oldValue !== 'undefined') &&
+                (typeof (this._oldAttributes as any)[name] === 'undefined') &&
+                oldValue !== value
+            ) {
+                (this._oldAttributes as any)[name] = oldValue;
                 this.emit(BaseObjectEvent.CHANGED_ATTRIBUTE);
             }
+            (this._attributes as any)[name] = value;
         }
-        (this._attributes as any)[name] = value;
     }
 
     /**
@@ -140,10 +150,8 @@ export class Model extends BaseObject
      */
     public hasAttribute(name : string) : boolean
     {
-        if (typeof this._attributes === 'undefined') {
-            return false;
-        }
-        return (name in this._attributes);
+        const meta = getOrCreateMeta(this.className);
+        return meta.attributes.includes(name);
     }
 
     /**
@@ -161,7 +169,7 @@ export class Model extends BaseObject
      */
     public getAttributesBy(only: string[]) : object
     {
-        let result = {};
+        const result = {};
         only.forEach((key) => {
             if (this.hasAttribute(key)) {
                 const value = this.getAttribute(key);

@@ -29,6 +29,7 @@ export class Collection extends BaseObject
      */
     public set data(data : object[])
     {
+
         this.clearData();
         data.forEach(async (value) => {
             if (value instanceof this.modelClass) {

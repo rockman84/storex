@@ -1,11 +1,15 @@
-import {Model} from "../../src";
 import {AuthorModel} from "./author.model";
 import {hasOne, attribute} from "../../src";
-import {ApiModel} from "../../src/api.model";
+import {ApiModel} from "../../src";
+import {FetchTransport} from "../../src/transport/fetch.transport";
+
+const transport = new FetchTransport('http://api.iweb.dev.id:90/example/book');
 
 export class BookModel extends ApiModel
 {
-    @attribute()
+    transport = transport;
+
+    @attribute({isIndex: true})
     public id? : number;
 
     @attribute()

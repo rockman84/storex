@@ -1,19 +1,39 @@
 import {TransportInterface} from "./transport.interface";
 import {BaseObject} from "../base/base.object";
-import {ResponseTransport} from "./response.transport";
+import {Action, ResponseTransport} from "./response.transport";
 import {ApiCollection} from "../api.collection";
 import {ApiModel} from "../api.model";
 
+/**
+ * Interface of response of errors
+ */
 export interface ErrorValidation {
+    /**
+     * field or attribute name
+     */
     field: string;
+
+    /**
+     * error message
+     */
     message: string;
 }
 
 export interface ApiParamsOptions {
+    /**
+     * method name eg. post, get, put, patch, delete, etc
+     */
     method: string;
+
+    /**
+     * sub path of url eg. update/{id}
+     */
     path: string;
 }
 
+/**
+ * interface Fetch Transport of Api Options
+ */
 export interface ApiOptions {
     createOne?: ApiParamsOptions;
     updateOne?: ApiParamsOptions;
@@ -22,24 +42,39 @@ export interface ApiOptions {
     getMany?: ApiParamsOptions;
 }
 
-export const createResponseTransport = async (model: ApiModel, response: Response) : Promise<ResponseTransport> =>
+/**
+ * Create response Transport
+ * @param action
+ * @param model
+ * @param response
+ */
+export const createResponseTransport = async (action : Action , model: ApiModel, response: Response) : Promise<ResponseTransport> =>
 {
-    const result = await response.json();
+    const result = (response.status !== 204) ? await response.json() : {};
     if (response.status === 422) {
         result.forEach((error: ErrorValidation) => {
             model.addError(error.field, error.message);
         });
     }
     return new ResponseTransport(
-        response.status === 200 || response.status === 201,
-        result
+        action,
+        response.status === 200 || response.status === 201 || response.status === 204,
+        result,
+        response
     );
 }
 
 export class FetchTransport extends BaseObject implements TransportInterface
 {
+    /**
+     * base endpoint of api url
+     * @private
+     */
     private readonly _baseUrl : string;
 
+    /**
+     * configuration of api options actions
+     */
     public apiOptions : ApiOptions = {
         createOne: {
             method: 'post',
@@ -50,11 +85,11 @@ export class FetchTransport extends BaseObject implements TransportInterface
             path: 'update',
         },
         deleteOne: {
-            method: 'post',
+            method: 'delete',
             path: 'delete',
         },
         getOne: {
-            method: 'post',
+            method: 'get',
             path: 'view',
         },
         getMany: {
@@ -71,21 +106,34 @@ export class FetchTransport extends BaseObject implements TransportInterface
         }
     }
 
+    /**
+     * creating absolute url endpoint
+     * @param url
+     * @param params
+     */
     public createUrl(url: string | undefined, params : object = {}) : string
     {
         if (typeof url === 'undefined') {
             throw new Error('Not Supported Url');
         }
+
+        const normalizeUrl = url.replace(/{(\w+)}/g,(substring, field) => {
+            if (typeof (params as any)[field] !== 'undefined') {
+                const value = (params as any)[field];
+                delete (params as any)[field];
+                return value;
+            }
+        });
         let queryParams = '';
         if (params) {
             queryParams = '?' + (new URLSearchParams((params as any))).toString();
         }
-        return `${this._baseUrl}/${url}${queryParams}`;
+        return `${this._baseUrl}/${normalizeUrl}${queryParams}`;
     }
 
-    async createOne(model: ApiModel, attributes : object, requestOptions?: RequestInit): Promise<ResponseTransport>
+    async createOne(model: ApiModel, attributes : object, query? : object, requestOptions?: RequestInit): Promise<ResponseTransport>
     {
-        const request = new Request(this.createUrl(this.apiOptions.createOne?.path), {
+        const request = new Request(this.createUrl(this.apiOptions.createOne?.path, query), {
             body: JSON.stringify(attributes),
             method: this.apiOptions.createOne?.method,
             headers: {
@@ -95,10 +143,10 @@ export class FetchTransport extends BaseObject implements TransportInterface
         });
 
         const response = await fetch (request);
-        return await createResponseTransport(model, response);
+        return await createResponseTransport(Action.CREATE_ONE, model, response);
     }
 
-    async updateOne(model: ApiModel, attributes: object, requestOptions?: RequestInit): Promise<ResponseTransport>
+    async updateOne(model: ApiModel, attributes: object, query?: object, requestOptions?: RequestInit): Promise<ResponseTransport>
     {
         const url = this.createUrl(this.apiOptions.updateOne?.path, {
             id: model.getAttribute('id')
@@ -114,24 +162,23 @@ export class FetchTransport extends BaseObject implements TransportInterface
         });
 
         const response = await fetch (request);
-        return await createResponseTransport(model, response);
+        return await createResponseTransport(Action.UPDATE_ONE, model, response);
     }
 
-    async deleteOne(model: ApiModel, requestOptions?: RequestInit): Promise<ResponseTransport>
+    async deleteOne(model: ApiModel, query? : object, requestOptions?: RequestInit): Promise<ResponseTransport>
     {
-        const request = new Request(this.createUrl(this.apiOptions.deleteOne?.path),{
+        const request = new Request(this.createUrl(this.apiOptions.deleteOne?.path, query),{
             method: this.apiOptions.deleteOne?.method,
             headers: {
                 'Content-Type' : 'application/json'
             },
         });
         const response = await fetch(request);
-        return await createResponseTransport(model, response);
+        return await createResponseTransport(Action.DELETE_ONE, model, response);
     }
 
     async getMany(collection: ApiCollection, query?: object, requestOptions?: RequestInit): Promise<ResponseTransport>
     {
-        new URLSearchParams();
         const request = new Request(this.createUrl(this.apiOptions.getMany?.path, query), {
             method: this.apiOptions.getMany?.method,
             headers: {
@@ -141,17 +188,17 @@ export class FetchTransport extends BaseObject implements TransportInterface
         });
         const response = await fetch(request);
         const result = await response.json();
-        const success = response.status === 200 || response.status == 201;
+        const success = response.status === 200 || response.status === 201;
         if (success) {
-            collection.pagination.totalCount = parseInt(response.headers.get('X-Pagination-Total-Count') as any);
-            collection.pagination.totalPage = parseInt(response.headers.get('X-Pagination-Page-Count') as any);
-            collection.pagination.currentPage = parseInt(response.headers.get('X-Pagination-Current-Page') as any);
-            collection.pagination.pageSize = parseInt(response.headers.get('X-Pagination-Per-Page') as any);
+            collection.pagination.totalCount = parseInt(response.headers.get('X-Pagination-Total-Count') as any, 10);
+            collection.pagination.totalPage = parseInt(response.headers.get('X-Pagination-Page-Count') as any, 10);
+            collection.pagination.currentPage = parseInt(response.headers.get('X-Pagination-Current-Page') as any, 10);
+            collection.pagination.pageSize = parseInt(response.headers.get('X-Pagination-Per-Page') as any, 10);
         }
-        return new ResponseTransport(success, result, response);
+        return new ResponseTransport(Action.GET_MANY, success, result, response);
     }
 
-    async getOne(model: ApiModel, query : object, requestOptions?: RequestInit): Promise<ResponseTransport>
+    async getOne(model: ApiModel, query? : object, requestOptions?: RequestInit): Promise<ResponseTransport>
     {
         const request = new Request(this.createUrl(this.apiOptions.getOne?.path, query), {
             method: this.apiOptions.getOne?.method,
@@ -163,8 +210,10 @@ export class FetchTransport extends BaseObject implements TransportInterface
         const response = await fetch(request);
         const result = await response.json();
         return new ResponseTransport(
+            Action.GET_ONE,
             response.status === 200,
             result,
+            response,
         );
     }
 }

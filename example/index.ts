@@ -1,5 +1,5 @@
-import {BookModel} from "./model/book.model";
+import {Booksa} from "./model/book.model";
 
-const book = new BookModel({name: 'Harry Porter'});
+const book = new Booksa({name: 'Harry Porter'});
 
 book.show = false;

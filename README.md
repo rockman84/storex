@@ -13,8 +13,8 @@ class Author extends Model
     name? : string;
 }
 
-// book.model.ts
-class BookModel extends Model
+// booksa.ts
+class Booksa extends Model
 {
     @attribute()
     id? : number;

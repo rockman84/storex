@@ -1,29 +1,38 @@
-import {BaseObject} from "../base/base.object";
 import "reflect-metadata";
+import {getOrCreateMeta} from "./meta.entity";
+
 
 /**
  * interface of attribute options
  */
 export interface AttributeOptions {
-    name: string;
+    isIndex?: boolean;
+    defaultValue?: any;
 }
 
-export function attribute(options? : AttributeOptions) {
-    return (target: BaseObject, name: string) : void => {
-        // const metadata = Reflect.getMetadata('design:type', target, name);
+export const attribute = (options? : AttributeOptions) => {
+    return (target: any, name: string) : void => {
+        const opts = {...{defaultValue: null}, ...options}
         const key = name;
+        const meta = getOrCreateMeta(target.constructor.name);
+        if (!meta.attributes.includes(name)) {
+            meta.attributes.push(name);
+        }
+        if (opts.isIndex && !meta.index.includes(name)) {
+            meta.index.push(name);
+        }
         Reflect.defineProperty( target, name, {
             enumerable: true,
             configurable: true,
             get() {
-                if (this.hasAttribute(key)) {
+                if (name in this._attributes) {
                     return this.getAttribute(key);
                 }
-                this.setAttribute(key, null);
-                return null;
+                this.setAttribute(key, opts.defaultValue);
+                return opts.defaultValue;
             },
             set(value) {
-                this.setAttribute(key, value);
+                this.setAttribute(key, typeof value !== 'undefined' ? value : opts.defaultValue);
             }
         });
     }

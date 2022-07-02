@@ -1,9 +1,34 @@
 import {attribute} from "../src";
 import {ModelEvent} from "../src";
 import {BookModel} from "../example/model/book.model";
-import {AuthorModel} from "../example/model/author.model";
 import {BookCollection} from "../example/model/book.collection";
-import {AuthorCollection} from "../example/model/author.collection";
+import {AuthorModel, AuthorCollection} from "../example/model/author.model";
+import {entities} from "../src/decorator/meta.entity";
+
+test('check property', async () => {
+    const data = {
+        id: 123,
+        name: 'Author Name',
+        books: [
+            {
+                id: 1,
+                name: 'Book 1',
+            },
+            {
+                id: 2,
+                name: 'Book 2'
+            }
+        ]
+    };
+    const author = new AuthorModel(data);
+    expect(author.id).toEqual(123);
+    expect(author.name).toEqual('Author Name');
+    expect(author.books).toBeInstanceOf(BookCollection);
+    await author.books?.data;
+    expect(author.books?.count).toEqual(2);
+
+    console.log(entities);
+});
 
 test('Test Model',() => {
     const booksData = [
@@ -67,8 +92,9 @@ test('Test Model',() => {
         expect(author).toBeInstanceOf(AuthorModel);
         expect(author?.id).toEqual(book.author_id);
 
+        const a = author?.books;
         // relation hasMany
-        expect(author?.books).toBeInstanceOf(BookCollection);
+        //expect(author?.books).toBeInstanceOf(BookCollection);
         //expect(author?.books?.parent).toEqual(author);
 
         // check validation
