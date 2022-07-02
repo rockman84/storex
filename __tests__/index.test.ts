@@ -1,8 +1,32 @@
 import {attribute} from "../src";
 import {ModelEvent} from "../src";
-import {BookModel, BookCollection} from "../example/model/book.model";
+import {BookModel} from "../example/model/book.model";
+import {BookCollection} from "../example/model/book.collection";
 import {AuthorModel, AuthorCollection} from "../example/model/author.model";
+import {entities} from "../src/decorator/meta.entity";
 
+test('check property', async () => {
+    const data = {
+        id: 123,
+        name: 'Halllo',
+        books: [
+            {
+                id: 234,
+                name: 'Book name ss',
+            }
+        ]
+    };
+    const author = new AuthorModel(data);
+    author.name = 'hansen s';
+
+
+    const author2 = new AuthorModel();
+
+    // console.log(entities);
+    // console.log(author.hasAttribute('id'));
+    // console.log(author.attributes);
+    // console.log(author.name);
+});
 
 test('Test Model',() => {
     const booksData = [

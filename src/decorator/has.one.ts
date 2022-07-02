@@ -1,4 +1,5 @@
 import {Model} from "../model";
+import {getOrCreateMeta} from "./meta.entity";
 import "reflect-metadata";
 
 export interface HasOneOptions {
@@ -14,6 +15,10 @@ export function hasOne (options:HasOneOptions) {
     const defaultOptions = {attribute: null, targetAttribute: null, createModelWhenEmpty: true};
     const opts = {...defaultOptions, ...options};
     return (target : Model, property : string) => {
+        const meta = getOrCreateMeta(target.constructor.name);
+        if (!meta.hasOne.includes(property)) {
+            meta.hasOne.push(property);
+        }
         Reflect.defineProperty(target, property , {
             enumerable: true,
             configurable: true,

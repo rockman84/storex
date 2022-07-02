@@ -1,32 +1,38 @@
 import {Model} from "../model";
 import {Collection} from "../collection";
+import {getOrCreateMeta} from "./meta.entity";
 
 export interface HasManyOptions {
-    collectionClass: typeof Collection;
+    collection: any;
     attribute : string;
     targetAttribute: string;
 }
+
 /**
  * decorator has many property
  */
 export function hasMany(options?: HasManyOptions) {
-    return (target: Model, property: string) => {
-        const opts = {collectionClass: Collection, ...options};
-        const objectClass = opts.collectionClass;
+    const opts = {...{collection: Collection}, ...options};
+    return (target: any, property: string) => {
+        const meta = getOrCreateMeta(target.constructor.name);
+        if (!meta.hasMany.includes(property)) {
+            meta.hasMany.push(property);
+        }
         Reflect.defineProperty(target, property, {
             enumerable: true,
             configurable: true,
-            set(value: any) {
-                if (value instanceof objectClass) {
-                    this._hasMany[property] = value;
-                }
-            },
-            get() {
-                if (!(property in Object.keys(this._hasMany))) {
-                    const collection = new (opts.collectionClass as any)();
-                    // collection._parent = this;
+            set(data: object) {
+                let collection = this._hasMany[property];
+                if (typeof collection === 'undefined') {
+                    collection = new (opts.collection as any)();
                     this._hasMany[property] = collection;
                 }
+                if (typeof data === 'object') {
+                    collection.data = data;
+                }
+
+            },
+            get() {
                 return this._hasMany[property];
             }
         });

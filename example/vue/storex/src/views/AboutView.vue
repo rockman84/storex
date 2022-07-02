@@ -6,10 +6,10 @@
       <a @click="onResetAuthor" v-if="author.isDirtyAttribute" href="#">Reset</a>
     </form>
 
-    <h1>Add Book: {{bookModel.name}}</h1>
+    <h1>Add BookModel: {{bookModel.name}}</h1>
     <form @submit.prevent>
       <input v-model="bookModel.name">
-      <button @click="onAddBook">Add Book</button>
+      <button @click="onAddBook">Add BookModel</button>
 
     </form>
 
@@ -21,7 +21,7 @@
   </div>
 </template>
 <script>
-import {BookModel} from "../../../../model/book.model";
+import {Booksa} from "../../../../model/book.model";
 import {BookCollection} from "../../../../model/book.collection";
 import {AuthorModel} from "../../../../model/author.model";
 
@@ -29,7 +29,7 @@ export default {
   data() {
     const author = new AuthorModel({name: 'JK Rowling'});
     return {
-      bookModel: new BookModel(),
+      bookModel: new Booksa(),
       author: author,
       books: author.books,
     };
@@ -39,7 +39,7 @@ export default {
       console.log('valid', this.books.validateAll());
       this.bookModel.id = Math.random();
       this.books.push(this.bookModel);
-      this.bookModel = new BookModel();
+      this.bookModel = new Booksa();
     },
     onResetAuthor() {
       this.author.reset();

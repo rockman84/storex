@@ -1,12 +1,14 @@
 import {AuthorModel} from "./author.model";
-import {hasOne, attribute, ApiCollection} from "../../src";
+import {hasOne, attribute} from "../../src";
 import {ApiModel} from "../../src";
 import {FetchTransport} from "../../src/transport/fetch.transport";
 
-export const transport = new FetchTransport('http://api.iweb.dev.id:90/example/book');
+const transport = new FetchTransport('http://api.iweb.dev.id:90/example/book');
 
 export class BookModel extends ApiModel
 {
+    transport = transport;
+
     @attribute()
     public id? : number;
 
@@ -22,10 +24,4 @@ export class BookModel extends ApiModel
         modelClass: AuthorModel,
         attribute: 'author_id', targetAttribute: 'id', createModelWhenEmpty: true})
     public author? : AuthorModel;
-}
-
-export class BookCollection extends ApiCollection
-{
-    transport = transport;
-    protected modelClass = BookModel;
 }
