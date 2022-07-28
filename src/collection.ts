@@ -4,7 +4,7 @@ import {Event} from "./base/event";
 
 export class Collection extends BaseObject
 {
-    private _parent? : typeof Model|null;
+    private readonly _parent? : any;
 
     private _data : typeof Model[] = [];
 
@@ -13,6 +13,11 @@ export class Collection extends BaseObject
     public get parent()
     {
         return this._parent;
+    }
+
+    public constructor(parent? : BaseObject) {
+        super();
+        this._parent = parent;
     }
 
     /**

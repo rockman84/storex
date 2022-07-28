@@ -109,6 +109,7 @@ export class Model extends BaseObject
             model.setAttributes(value);
         } else if (meta.hasMany.includes(name)) {
             const collection : Collection = (this as any)[name];
+            // console.log(collection);
             collection.data = value;
         } else if (meta.attributes.includes(name)) {
             const oldValue = this.getAttribute(name);
@@ -137,7 +138,7 @@ export class Model extends BaseObject
      * set or add attributes
      * @param params
      */
-    public setAttributes(params : object) : void
+    public async setAttributes(params : object) : Promise<void>
     {
         if (params === null) {
             return;

@@ -30,6 +30,39 @@ test('check property', async () => {
     console.log(entities);
 });
 
+test('Test set Nested Attributes', async () => {
+    const bookData = {
+        id: 1,
+        name: 'Book Name',
+        author: {
+            id: 2,
+            name: 'Author Name'
+        }
+    };
+    const book = new BookModel();
+    book.setAttributes(bookData);
+    expect(book.name).toEqual('Book Name');
+    expect(book.author).toBeInstanceOf(AuthorModel);
+    expect(book.author?.name).toEqual('Author Name');
+
+    const authorData = {
+        id: 1,
+        name: 'Author Name',
+        books: [
+            {id: 1, name: 'Book 1'},
+            {id: 2, name: 'Book 2'}
+        ],
+    };
+
+    const author = new AuthorModel();
+    console.log(author.books);
+    await author.setAttributes(authorData);
+    expect(author.name).toEqual('Author Name');
+    expect(author.books).toBeInstanceOf(BookCollection);
+    expect(author.books?.count).toEqual(2);
+
+});
+
 test('Test Model',() => {
     const booksData = [
         {id: 1, name: 'Harry Porter', author_id: 1, show: 'wrong'},
@@ -94,8 +127,8 @@ test('Test Model',() => {
 
         const a = author?.books;
         // relation hasMany
-        //expect(author?.books).toBeInstanceOf(BookCollection);
-        //expect(author?.books?.parent).toEqual(author);
+        expect(author?.books).toBeInstanceOf(BookCollection);
+        expect(author?.books?.parent).toEqual(author);
 
         // check validation
         // expect(book.validate()).toBeTruthy();

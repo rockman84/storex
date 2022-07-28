@@ -5,7 +5,7 @@ import {FetchTransport} from "../transport/fetch.transport";
 import {ApiModel} from "../api.model";
 
 export interface HasManyOptions {
-    collection: any;
+    collectionClass: typeof Collection;
     attribute : string;
     targetAttribute: string;
     autoLoad?: boolean;
@@ -15,7 +15,8 @@ export interface HasManyOptions {
  * decorator has many property
  */
 export function hasMany(options?: HasManyOptions) {
-    const opts = {...{collection: Collection}, ...options};
+    const opts = {...{collectionClass: Collection}, ...options};
+    console.log(opts);
     return (target: any, property: string) => {
         const meta = getOrCreateMeta(target.constructor.name);
         if (!meta.hasMany.includes(property)) {
@@ -25,9 +26,12 @@ export function hasMany(options?: HasManyOptions) {
             enumerable: true,
             configurable: true,
             set(data: object) {
+                if (data instanceof Collection) {
+                    this._hasMany[property] = data;
+                }
                 let collection = this._hasMany[property];
                 if (typeof collection === 'undefined') {
-                    collection = new (opts.collection as any)();
+                    collection = new (opts.collectionClass as any)(this);
                     this._hasMany[property] = collection;
                 }
                 if (typeof data === 'object') {
@@ -36,13 +40,17 @@ export function hasMany(options?: HasManyOptions) {
 
             },
             get() {
-                const collection = this._hasMany[property];
-                if (options?.autoLoad && this.transport instanceof FetchTransport && opts.targetAttribute) {
-                    const query : object = [];
-                    (query as any)[opts.targetAttribute] = this.getAttribute(opts.attribute)
-                    collection.findAll(query);
+                if (!(property in this._hasMany)) {
+                    this._hasMany[property] = new (options?.collectionClass as any)(this);
                 }
-                return collection;
+                return this._hasMany[property];
+                // const collection = this._hasMany[property];
+                // if (options?.autoLoad && this.transport instanceof FetchTransport && opts.targetAttribute) {
+                //     const query : object = [];
+                //     (query as any)[opts.targetAttribute] = this.getAttribute(opts.attribute)
+                //     collection.findAll(query);
+                // }
+                // return collection;
             }
         });
     }
