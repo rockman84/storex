@@ -1,8 +1,5 @@
-import {Model} from "../model";
 import {Collection} from "../collection";
 import {getOrCreateMeta} from "./meta.entity";
-import {FetchTransport} from "../transport/fetch.transport";
-import {ApiModel} from "../api.model";
 
 export interface HasManyOptions {
     collectionClass: typeof Collection;
