@@ -127,6 +127,17 @@ export class ApiModel extends Model
         await model.findOne(query);
         return model;
     }
+
+    public async fetch(input: RequestInfo | URL, init?: RequestInit)
+    {
+        const response = await fetch(input, init);
+        const result = await response.json();
+        if (response.ok) {
+            this.setAttributes(result);
+            this._isNew = false;
+        }
+        return {response, result};
+    }
 }
 
 export enum ApiModelEvent {

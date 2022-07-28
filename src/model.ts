@@ -105,10 +105,10 @@ export class Model extends BaseObject
     {
         const meta = getOrCreateMeta(this.className);
         if (meta.hasOne.includes(name)) {
-            const model : Model = (this._hasOne as any)[name];
+            const model : Model = (this as any)[name];
             model.setAttributes(value);
-        } else if ((name in this._hasMany)) {
-            const collection : Collection = (this._hasMany as any)[name];
+        } else if (meta.hasMany.includes(name)) {
+            const collection : Collection = (this as any)[name];
             collection.data = value;
         } else if (meta.attributes.includes(name)) {
             const oldValue = this.getAttribute(name);
@@ -139,6 +139,9 @@ export class Model extends BaseObject
      */
     public setAttributes(params : object) : void
     {
+        if (params === null) {
+            return;
+        }
         for(const key of Object.keys(params)) {
             this.setAttribute(key, (params as any)[key]);
         }
