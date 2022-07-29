@@ -26,8 +26,6 @@ test('check property', async () => {
     expect(author.books).toBeInstanceOf(BookCollection);
     await author.books?.data;
     expect(author.books?.count).toEqual(2);
-
-    console.log(entities);
 });
 
 test('Test set Nested Attributes', async () => {
@@ -40,7 +38,7 @@ test('Test set Nested Attributes', async () => {
         }
     };
     const book = new BookModel();
-    book.setAttributes(bookData);
+    await book.setAttributes(bookData);
     expect(book.name).toEqual('Book Name');
     expect(book.author).toBeInstanceOf(AuthorModel);
     expect(book.author?.name).toEqual('Author Name');
@@ -55,7 +53,6 @@ test('Test set Nested Attributes', async () => {
     };
 
     const author = new AuthorModel();
-    console.log(author.books);
     await author.setAttributes(authorData);
     expect(author.name).toEqual('Author Name');
     expect(author.books).toBeInstanceOf(BookCollection);
@@ -72,7 +69,7 @@ test('Test Model',() => {
         new BookModel(booksData[0]),
         new BookModel(booksData[1])
     ];
-    booksData.forEach( (v, n) => {
+    booksData.forEach( async (v, n) => {
         const book = books[n];
 
         // check attributes
@@ -89,9 +86,11 @@ test('Test Model',() => {
         // check old attributes
         expect(book.name = 'Demon Slayer').toEqual('Demon Slayer');
         expect(book.oldAttributes).toEqual({name: v.name});
-        expect(book.reset()).toBeUndefined();
-        expect(book.oldAttributes).toEqual({});
-        expect(book.isDirtyAttribute).toBeFalsy();
+        book.reset().then(() => {
+            expect(book.oldAttributes).toEqual({});
+            expect(book.isDirtyAttribute).toBeFalsy();
+        });
+
 
         // check property
         expect(book.getAttribute('show')).toEqual(null);
@@ -101,8 +100,8 @@ test('Test Model',() => {
         expect(book.className).toEqual('BookModel');
 
         // check load function
-        expect(book.load({non: 'anything'})).toBeFalsy();
-        expect(book.load({id: 3, show: false})).toBeTruthy();
+        expect(await book.load({non: 'anything'})).toBeFalsy();
+        expect(await book.load({id: 3, show: false})).toBeTruthy();
         expect(book.show).toBeTruthy();
 
 

@@ -26,7 +26,7 @@ export class ApiModel extends Model
             await this.transport.updateOne(this, only ? this.getAttributesBy(only) : this.attributes, {...query, ...this.getAttributesBy(['id'])});
         if (response.success) {
             this._isNew = false;
-            this.setAttributes(response.data);
+            await this.setAttributes(response.data);
             await this.afterSave(this._oldAttributes);
             this.clearOldAttributes();
         }
@@ -104,7 +104,7 @@ export class ApiModel extends Model
         if (response.success) {
             this._isNew = false;
             this.clearOldAttributes();
-            this.setAttributes(response.data);
+            await this.setAttributes(response.data);
             await this.afterFind(response);
         }
         return response;
@@ -133,7 +133,7 @@ export class ApiModel extends Model
         const response = await fetch(input, init);
         const result = await response.json();
         if (response.ok) {
-            this.setAttributes(result);
+            await this.setAttributes(result);
             this._isNew = false;
         }
         return {response, result};

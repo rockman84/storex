@@ -13,7 +13,6 @@ export interface HasManyOptions {
  */
 export function hasMany(options?: HasManyOptions) {
     const opts = {...{collectionClass: Collection}, ...options};
-    console.log(opts);
     return (target: any, property: string) => {
         const meta = getOrCreateMeta(target.constructor.name);
         if (!meta.hasMany.includes(property)) {

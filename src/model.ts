@@ -78,7 +78,7 @@ export class Model extends BaseObject
      * load data to exist attributes
      * @param params
      */
-    load(params : object) : boolean
+    public async load(params : object) : Promise<boolean>
     {
         let load = false;
 
@@ -86,7 +86,7 @@ export class Model extends BaseObject
 
         for(const key of Object.keys(params)) {
             if (this.hasAttribute(key)) {
-                this.setAttribute(key, (params as any)[key]);
+                await this.setAttribute(key, (params as any)[key]);
                 load = true;
             }
         }
@@ -101,12 +101,12 @@ export class Model extends BaseObject
      * @param name
      * @param value
      */
-    public setAttribute(name : string, value : any) : void
+    public async setAttribute(name : string, value : any) : Promise<void>
     {
         const meta = getOrCreateMeta(this.className);
         if (meta.hasOne.includes(name)) {
             const model : Model = (this as any)[name];
-            model.setAttributes(value);
+            await model.setAttributes(value);
         } else if (meta.hasMany.includes(name)) {
             const collection : Collection = (this as any)[name];
             // console.log(collection);
@@ -128,9 +128,9 @@ export class Model extends BaseObject
     /**
      * reset attributes value for old attributes then clear old attributes
      */
-    public reset() : void
+    public async reset() : Promise<void>
     {
-        this.setAttributes(this._oldAttributes);
+        await this.setAttributes(this._oldAttributes);
         this.clearOldAttributes();
     }
 
@@ -144,7 +144,7 @@ export class Model extends BaseObject
             return;
         }
         for(const key of Object.keys(params)) {
-            this.setAttribute(key, (params as any)[key]);
+            await this.setAttribute(key, (params as any)[key]);
         }
     }
 
