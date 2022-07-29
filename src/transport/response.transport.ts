@@ -7,6 +7,7 @@ export enum Action {
     DELETE_ONE = 'deleteOne',
     GET_ONE = 'getOne',
     GET_MANY = 'getMany',
+    FETCH = 'fetch',
 }
 
 export class ResponseTransport {

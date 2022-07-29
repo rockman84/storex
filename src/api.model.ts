@@ -2,7 +2,7 @@ import {Model} from "./model";
 import {TransportInterface} from "./transport/transport.interface";
 import {Action, ResponseTransport} from "./transport/response.transport";
 import {Event} from "./base/event";
-import {FetchTransport} from "./transport/fetch.transport";
+import {createResponseTransport, FetchTransport} from "./transport/fetch.transport";
 
 export class ApiModel extends Model
 {
@@ -26,7 +26,7 @@ export class ApiModel extends Model
             await this.transport.updateOne(this, only ? this.getAttributesBy(only) : this.attributes, {...query, ...this.getAttributesBy(['id'])});
         if (response.success) {
             this._isNew = false;
-            this.setAttributes(response.data);
+            await this.setAttributes(response.data);
             await this.afterSave(this._oldAttributes);
             this.clearOldAttributes();
         }
@@ -104,7 +104,7 @@ export class ApiModel extends Model
         if (response.success) {
             this._isNew = false;
             this.clearOldAttributes();
-            this.setAttributes(response.data);
+            await this.setAttributes(response.data);
             await this.afterFind(response);
         }
         return response;
@@ -126,6 +126,18 @@ export class ApiModel extends Model
         const model = new this();
         await model.findOne(query);
         return model;
+    }
+
+    public async fetch(input: RequestInfo | URL, init?: RequestInit) : Promise<ResponseTransport>
+    {
+        const response = await fetch(input, init);
+        const responseTransport = await createResponseTransport(Action.FETCH, this, response);
+        if (responseTransport.success) {
+            this.clearOldAttributes();
+            await this.setAttributes(responseTransport.data);
+            this._isNew = false;
+        }
+        return responseTransport;
     }
 }
 
