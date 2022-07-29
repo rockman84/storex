@@ -2,7 +2,7 @@ import {Model} from "./model";
 import {TransportInterface} from "./transport/transport.interface";
 import {Action, ResponseTransport} from "./transport/response.transport";
 import {Event} from "./base/event";
-import {FetchTransport} from "./transport/fetch.transport";
+import {createResponseTransport, FetchTransport} from "./transport/fetch.transport";
 
 export class ApiModel extends Model
 {
@@ -128,15 +128,16 @@ export class ApiModel extends Model
         return model;
     }
 
-    public async fetch(input: RequestInfo | URL, init?: RequestInit)
+    public async fetch(input: RequestInfo | URL, init?: RequestInit) : Promise<ResponseTransport>
     {
         const response = await fetch(input, init);
-        const result = await response.json();
-        if (response.ok) {
-            await this.setAttributes(result);
+        const responseTransport = await createResponseTransport(Action.FETCH, this, response);
+        if (responseTransport.success) {
+            this.clearOldAttributes();
+            await this.setAttributes(responseTransport.data);
             this._isNew = false;
         }
-        return {response, result};
+        return responseTransport;
     }
 }
 
