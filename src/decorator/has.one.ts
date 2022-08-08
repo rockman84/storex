@@ -3,7 +3,6 @@ import {getOrCreateMeta} from "./meta.entity";
 import "reflect-metadata";
 
 export interface HasOneOptions {
-    modelClass: typeof Model;
     attribute?: string;
     targetAttribute?: string;
     createModelWhenEmpty?:boolean;
@@ -11,9 +10,10 @@ export interface HasOneOptions {
 /**
  * decorator has one property
  */
-export function hasOne (options:HasOneOptions) {
+export function hasOne (modelClass : () => typeof Model, options:HasOneOptions) {
     const defaultOptions = {attribute: null, targetAttribute: null, createModelWhenEmpty: true};
     const opts = {...defaultOptions, ...options};
+    const modelName = modelClass();
     return (target : Model, property : string) => {
         const meta = getOrCreateMeta(target.constructor.name);
         if (!meta.hasOne.includes(property)) {
@@ -23,14 +23,14 @@ export function hasOne (options:HasOneOptions) {
             enumerable: true,
             configurable: true,
             set(value) {
-                if (value instanceof options.modelClass) {
+                if (value instanceof modelName) {
                     this._hasOne[property] = value;
                 }
                 throw new Error(`value not instance of model`);
             },
             get() {
                 if (opts.createModelWhenEmpty && !(property in this._hasOne)) {
-                    this._hasOne[property] = new (options.modelClass as any)();
+                    this._hasOne[property] = new (modelName as any)();
                     if (opts.targetAttribute !== null && opts.attribute !== null) {
                         this._hasOne[property][opts.targetAttribute] = this[opts.attribute];
                     }
