@@ -20,8 +20,7 @@ export class BookModel extends ApiModel
 
     show?: boolean = true;
 
-    @hasOne({
-        modelClass: AuthorModel,
+    @hasOne( () => AuthorModel, {
         attribute: 'author_id', targetAttribute: 'id', createModelWhenEmpty: true})
     public author? : AuthorModel;
 }

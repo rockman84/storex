@@ -2,7 +2,6 @@ import {Collection} from "../collection";
 import {getOrCreateMeta} from "./meta.entity";
 
 export interface HasManyOptions {
-    collectionClass: typeof Collection;
     attribute : string;
     targetAttribute: string;
     autoLoad?: boolean;
@@ -11,8 +10,9 @@ export interface HasManyOptions {
 /**
  * decorator has many property
  */
-export function hasMany(options?: HasManyOptions) {
-    const opts = {...{collectionClass: Collection}, ...options};
+export function hasMany(collectionClass : () => typeof Collection, options?: HasManyOptions) {
+    const opts = options;
+    const collectionName = collectionClass();
     return (target: any, property: string) => {
         const meta = getOrCreateMeta(target.constructor.name);
         if (!meta.hasMany.includes(property)) {
@@ -27,7 +27,7 @@ export function hasMany(options?: HasManyOptions) {
                 }
                 let collection = this._hasMany[property];
                 if (typeof collection === 'undefined') {
-                    collection = new (opts.collectionClass as any)(this);
+                    collection = new (collectionName as any)(this);
                     this._hasMany[property] = collection;
                 }
                 if (typeof data === 'object') {
@@ -37,7 +37,7 @@ export function hasMany(options?: HasManyOptions) {
             },
             get() {
                 if (!(property in this._hasMany)) {
-                    this._hasMany[property] = new (options?.collectionClass as any)(this);
+                    this._hasMany[property] = new (collectionName as any)(this);
                 }
                 return this._hasMany[property];
                 // const collection = this._hasMany[property];

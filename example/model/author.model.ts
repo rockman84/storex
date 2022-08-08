@@ -21,6 +21,6 @@ export class AuthorModel extends ApiModel
     @attribute({defaultValue: null})
     name? : string;
 
-    @hasMany({collectionClass: BookCollection, attribute: 'id', targetAttribute: 'author_id'})
+    @hasMany(() => BookCollection, {attribute: 'id', targetAttribute: 'author_id'})
     books?: BookCollection;
 }
