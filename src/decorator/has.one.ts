@@ -13,7 +13,6 @@ export interface HasOneOptions {
 export function hasOne (modelClass : () => typeof Model, options:HasOneOptions) {
     const defaultOptions = {attribute: null, targetAttribute: null, createModelWhenEmpty: true};
     const opts = {...defaultOptions, ...options};
-    const modelName = modelClass();
     return (target : Model, property : string) => {
         const meta = getOrCreateMeta(target.constructor.name);
         if (!meta.hasOne.includes(property)) {
@@ -23,14 +22,14 @@ export function hasOne (modelClass : () => typeof Model, options:HasOneOptions) 
             enumerable: true,
             configurable: true,
             set(value) {
-                if (value instanceof modelName) {
+                if (value instanceof modelClass()) {
                     this._hasOne[property] = value;
                 }
                 throw new Error(`value not instance of model`);
             },
             get() {
                 if (opts.createModelWhenEmpty && !(property in this._hasOne)) {
-                    this._hasOne[property] = new (modelName as any)();
+                    this._hasOne[property] = new (modelClass() as any)();
                     if (opts.targetAttribute !== null && opts.attribute !== null) {
                         this._hasOne[property][opts.targetAttribute] = this[opts.attribute];
                     }
