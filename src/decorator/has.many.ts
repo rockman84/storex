@@ -12,7 +12,6 @@ export interface HasManyOptions {
  */
 export function hasMany(collectionClass : () => typeof Collection, options?: HasManyOptions) {
     const opts = options;
-    const collectionName = collectionClass();
     return (target: any, property: string) => {
         const meta = getOrCreateMeta(target.constructor.name);
         if (!meta.hasMany.includes(property)) {
@@ -27,7 +26,7 @@ export function hasMany(collectionClass : () => typeof Collection, options?: Has
                 }
                 let collection = this._hasMany[property];
                 if (typeof collection === 'undefined') {
-                    collection = new (collectionName as any)(this);
+                    collection = new (collectionClass() as any)(this);
                     this._hasMany[property] = collection;
                 }
                 if (typeof data === 'object') {
@@ -37,7 +36,7 @@ export function hasMany(collectionClass : () => typeof Collection, options?: Has
             },
             get() {
                 if (!(property in this._hasMany)) {
-                    this._hasMany[property] = new (collectionName as any)(this);
+                    this._hasMany[property] = new (collectionClass() as any)(this);
                 }
                 return this._hasMany[property];
                 // const collection = this._hasMany[property];
