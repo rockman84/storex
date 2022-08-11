@@ -39,7 +39,7 @@ export class Collection extends BaseObject
             if (value instanceof this.modelClass) {
                 await this.push(value);
             } else {
-                const model = new this.modelClass(value);
+                const model = new this.modelClass();
                 await model.setAttributes(value);
                 await this.push(model);
             }
