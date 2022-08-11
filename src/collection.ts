@@ -32,17 +32,31 @@ export class Collection extends BaseObject
      * set new dataset item
      * @param data
      */
-    public set data(data : object[])
+    public setData(data : object[])
     {
-
         this.clearData();
         data.forEach(async (value) => {
             if (value instanceof this.modelClass) {
                 await this.push(value);
             } else {
-                await this.push(new this.modelClass(value));
+                const model = new this.modelClass(value);
+                await model.setAttributes(value);
+                await this.push(model);
             }
         });
+    }
+
+    /**
+     * convert to json
+     */
+    public toJson()
+    {
+        const data:[] = [];
+        this.data.forEach((model) => {
+            // @ts-ignore
+            return data.push((model.toJson()));
+        });
+        return data;
     }
 
     /**

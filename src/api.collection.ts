@@ -67,7 +67,7 @@ export class ApiCollection extends Collection
         }
         const response = await this.transport.getMany(this, query);
         if (response.success) {
-            this.data = (response.data as object[]);
+            await this.setData(response.data as object[]);
             await this.afterFind(response);
         }
         return response;

@@ -10,7 +10,7 @@ export interface HasOneOptions {
 /**
  * decorator has one property
  */
-export function hasOne (modelClass : () => typeof Model, options:HasOneOptions) {
+export function hasOne (modelClass : () => typeof Model, options?: HasOneOptions) {
     const defaultOptions = {attribute: null, targetAttribute: null, createModelWhenEmpty: true};
     const opts = {...defaultOptions, ...options};
     return (target : Model, property : string) => {

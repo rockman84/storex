@@ -30,7 +30,7 @@ export function hasMany(collectionClass : () => typeof Collection, options?: Has
                     this._hasMany[property] = collection;
                 }
                 if (typeof data === 'object') {
-                    collection.data = data;
+                    collection.setData(data);
                 }
 
             },
