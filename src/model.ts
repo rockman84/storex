@@ -110,7 +110,7 @@ export class Model extends BaseObject
         } else if (meta.hasMany.includes(name)) {
             const collection : Collection = (this as any)[name];
             // console.log(collection);
-            collection.data = value;
+            await collection.setData(value);
         } else if (meta.attributes.includes(name)) {
             const oldValue = this.getAttribute(name);
             if (
@@ -123,6 +123,19 @@ export class Model extends BaseObject
             }
             (this._attributes as any)[name] = value;
         }
+    }
+
+    public toJson()
+    {
+        const data = this.attributes;
+        for (let key in this._hasMany) {
+            (data as any)[key] = (this as any)[key].toJson();
+        }
+        for (let key in this._hasOne) {
+            (data as any)[key] = (this._hasOne as any)[key].toJson();
+        }
+        return data;
+
     }
 
     /**
