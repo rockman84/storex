@@ -230,14 +230,6 @@ export class Model extends BaseObject
     }
 
     /**
-     * set rule attributes
-     */
-    protected rule() : object[]
-    {
-        return [];
-    }
-
-    /**
      * validate attributes value
      */
     public async validate() : Promise<boolean>
