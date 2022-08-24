@@ -20,12 +20,13 @@ test('check property', async () => {
             }
         ]
     };
-    const author = new AuthorModel(data);
+    const author = new AuthorModel();
+    await author.setAttributes(data);
     expect(author.id).toEqual(123);
     expect(author.name).toEqual('Author Name');
     expect(author.books).toBeInstanceOf(BookCollection);
     await author.books?.data;
-    // expect(author.books?.count).toEqual(2);
+    expect(author.books?.count).toEqual(2);
 });
 
 test('Test set Nested Attributes', async () => {
@@ -56,7 +57,7 @@ test('Test set Nested Attributes', async () => {
     await author.setAttributes(authorData);
     expect(author.name).toEqual('Author Name');
     expect(author.books).toBeInstanceOf(BookCollection);
-    //expect(author.books?.count).toEqual(2);
+    expect(author.books?.count).toEqual(2);
 
 });
 
@@ -130,7 +131,8 @@ test('Test Model',() => {
         expect(author?.books?.parent).toEqual(author);
 
         // check validation
-        // expect(book.validate()).toBeTruthy();
+        expect(await book.validate()).toBeTruthy();
+
     });
 });
 

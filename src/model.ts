@@ -2,6 +2,7 @@ import {BaseObject, BaseObjectEvent} from "./base/base.object";
 import {Collection} from "./collection";
 import {Event} from "./base/event";
 import {getOrCreateMeta} from "./decorator/meta.entity";
+import {validate} from "class-validator";
 
 export class Model extends BaseObject
 {
@@ -229,21 +230,22 @@ export class Model extends BaseObject
     }
 
     /**
-     * set rule attributes
-     */
-    protected rule() : object[]
-    {
-        return [];
-    }
-
-    /**
      * validate attributes value
      */
     public async validate() : Promise<boolean>
     {
         this.emit(new Event(ModelEvent.BEFORE_VALIDATE, this));
+        this._errors = [];
+        const validation = validate(this).then((errors) => {
+            for (const error of errors) {
+                for (const key in error.constraints) {
+                    this.addError(error.property, error.constraints[key]);
+                }
+            }
+            return errors.length === 0;
+        });
         this.emit(new Event(ModelEvent.AFTER_VALIDATE, this));
-        return true;
+        return validation;
     }
 }
 

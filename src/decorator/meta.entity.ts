@@ -1,4 +1,4 @@
-interface MetaEntityObject {
+export interface MetaEntityObject {
     className : string,
     attributes: string[],
     hasMany: string[],
