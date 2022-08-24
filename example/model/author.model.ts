@@ -23,4 +23,5 @@ export class AuthorModel extends ApiModel
 
     @hasMany(() => BookCollection, {attribute: 'id', targetAttribute: 'author_id'})
     books?: BookCollection;
+
 }

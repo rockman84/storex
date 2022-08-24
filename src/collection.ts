@@ -32,10 +32,10 @@ export class Collection extends BaseObject
      * set new dataset item
      * @param data
      */
-    public setData(data : object[])
+    public async setData(data : object[])
     {
         this.clearData();
-        data.forEach(async (value) => {
+        for (const value of data) {
             if (value instanceof this.modelClass) {
                 await this.push(value);
             } else {
@@ -43,7 +43,7 @@ export class Collection extends BaseObject
                 await model.setAttributes(value);
                 await this.push(model);
             }
-        });
+        }
     }
 
     /**
