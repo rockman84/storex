@@ -2,20 +2,20 @@ import {Model} from "./model";
 import {BaseObject} from "./base/base.object";
 import {Event} from "./base/event";
 
-export class Collection extends BaseObject
+export class Collection<T = undefined> extends BaseObject
 {
-    private readonly _parent? : any;
+    private readonly _parent? : T|undefined;
 
     private _data : typeof Model[] = [];
 
-    protected modelClass: typeof Model = Model;
+    protected modelClass : typeof Model = Model;
 
-    public get parent()
+    public get parent() : T|undefined
     {
         return this._parent;
     }
 
-    public constructor(parent? : BaseObject) {
+    public constructor(parent? : T) {
         super();
         this._parent = parent;
     }
@@ -107,6 +107,16 @@ export class Collection extends BaseObject
     {
         this.emit(new Event(CollectionEvent.AFTER_PUSH, this, item));
         return;
+    }
+
+    public indexOf(search: any, fromIndex? : number)
+    {
+        return this._data.indexOf(search, fromIndex);
+    }
+
+    async remove(predicate: (value : any, index: number) => Model)
+    {
+        this._data = this._data.filter(predicate);
     }
 
     public validateAll() : boolean

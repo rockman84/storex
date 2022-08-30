@@ -104,21 +104,27 @@ export class Model extends BaseObject
      */
     public async setAttribute(name : string, value : any) : Promise<void>
     {
+        // get meta data class
         const meta = getOrCreateMeta(this.className);
         if (meta.hasOne.includes(name)) {
+            // set hasOne attribute
             const model : Model = (this as any)[name];
             await model.setAttributes(value);
         } else if (meta.hasMany.includes(name)) {
-            const collection : Collection = (this as any)[name];
-            // console.log(collection);
+            // set hasMany attribute
+            const collection : Collection<any> = (this as any)[name];
             await collection.setData(value);
         } else if (meta.attributes.includes(name)) {
+            // set Attribute
             const oldValue = this.getAttribute(name);
+
+            // check old value attribute
             if (
                 (typeof oldValue !== 'undefined') &&
                 (typeof (this._oldAttributes as any)[name] === 'undefined') &&
                 oldValue !== value
             ) {
+                // set old value
                 (this._oldAttributes as any)[name] = oldValue;
                 this.emit(BaseObjectEvent.CHANGED_ATTRIBUTE);
             }
