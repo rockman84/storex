@@ -8,6 +8,8 @@ export class Collection<T = undefined> extends BaseObject
 
     private _data : typeof Model[] = [];
 
+    private _removed : typeof Model[] = [];
+
     protected modelClass : typeof Model = Model;
 
     public get parent() : T|undefined
@@ -65,6 +67,7 @@ export class Collection<T = undefined> extends BaseObject
     public clearData() : void
     {
         this._data = [];
+        this._removed = [];
     }
 
     /**
@@ -114,22 +117,43 @@ export class Collection<T = undefined> extends BaseObject
         return this._data.indexOf(search, fromIndex);
     }
 
-    async remove(predicate: (value : any, index: number) => Model)
-    {
-        this._data = this._data.filter(predicate);
+    async beforeRemove(item: typeof Model) {
+        return true;
     }
 
-    public validateAll() : boolean
+    async afterRemove(item: typeof Model) {
+        return true;
+    }
+
+    async remove(predicate: (value : any, index?: number) => boolean) : Promise<typeof Model[]>
+    {
+        const newItems = [];
+        for (const item of this._data) {
+            if (predicate(item) && await this.beforeRemove(item)) {
+                this._removed.push(item);
+                await this.afterRemove(item);
+            } else {
+                newItems.push(item)
+            }
+        }
+        this._data = newItems;
+        return this._removed;
+    }
+
+    public async validateAll() : Promise<boolean>
     {
         let valid = true;
-        this._data.forEach(async (item : any, index : number) => {
+        for (const item of this._data) {
+            // @ts-ignore
             valid = await item.validate() && valid;
-        });
+        }
         return valid;
     }
 }
 
 export enum CollectionEvent {
     BEFORE_PUSH = 'beforePush',
-    AFTER_PUSH = 'afterPush'
+    AFTER_PUSH = 'afterPush',
+    BEFORE_REMOVE = 'beforeRemove',
+    AFTER_REMOVE = 'afterRemove',
 }
