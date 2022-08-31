@@ -2,20 +2,22 @@ import {Model} from "./model";
 import {BaseObject} from "./base/base.object";
 import {Event} from "./base/event";
 
-export class Collection extends BaseObject
+export class Collection<T = undefined> extends BaseObject
 {
-    private readonly _parent? : any;
+    private readonly _parent? : T|undefined;
 
     private _data : typeof Model[] = [];
 
-    protected modelClass: typeof Model = Model;
+    private _removed : typeof Model[] = [];
 
-    public get parent()
+    protected modelClass : typeof Model = Model;
+
+    public get parent() : T|undefined
     {
         return this._parent;
     }
 
-    public constructor(parent? : BaseObject) {
+    public constructor(parent? : T) {
         super();
         this._parent = parent;
     }
@@ -65,6 +67,7 @@ export class Collection extends BaseObject
     public clearData() : void
     {
         this._data = [];
+        this._removed = [];
     }
 
     /**
@@ -109,17 +112,48 @@ export class Collection extends BaseObject
         return;
     }
 
-    public validateAll() : boolean
+    public indexOf(search: any, fromIndex? : number)
+    {
+        return this._data.indexOf(search, fromIndex);
+    }
+
+    async beforeRemove(item: typeof Model) {
+        return true;
+    }
+
+    async afterRemove(item: typeof Model) {
+        return true;
+    }
+
+    async remove(predicate: (value : any, index?: number) => boolean) : Promise<typeof Model[]>
+    {
+        const newItems = [];
+        for (const item of this._data) {
+            if (predicate(item) && await this.beforeRemove(item)) {
+                this._removed.push(item);
+                await this.afterRemove(item);
+            } else {
+                newItems.push(item)
+            }
+        }
+        this._data = newItems;
+        return this._removed;
+    }
+
+    public async validateAll() : Promise<boolean>
     {
         let valid = true;
-        this._data.forEach(async (item : any, index : number) => {
+        for (const item of this._data) {
+            // @ts-ignore
             valid = await item.validate() && valid;
-        });
+        }
         return valid;
     }
 }
 
 export enum CollectionEvent {
     BEFORE_PUSH = 'beforePush',
-    AFTER_PUSH = 'afterPush'
+    AFTER_PUSH = 'afterPush',
+    BEFORE_REMOVE = 'beforeRemove',
+    AFTER_REMOVE = 'afterRemove',
 }

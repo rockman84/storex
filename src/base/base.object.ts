@@ -1,6 +1,12 @@
 import {Event} from "./event";
 
-export class BaseObject {
+export interface BaseObjectInterface {
+    className: string;
+    listeners: object;
+    emit(emit: string) : void;
+}
+
+export class BaseObject implements BaseObjectInterface {
 
     /**
      * listeners mapping

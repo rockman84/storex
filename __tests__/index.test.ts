@@ -17,6 +17,10 @@ test('check property', async () => {
             {
                 id: 2,
                 name: 'Book 2'
+            },
+            {
+                id: 3,
+                name: 'Book 3'
             }
         ]
     };
@@ -25,7 +29,8 @@ test('check property', async () => {
     expect(author.id).toEqual(123);
     expect(author.name).toEqual('Author Name');
     expect(author.books).toBeInstanceOf(BookCollection);
-    await author.books?.data;
+    expect(author.books?.count).toEqual(3);
+    await author.books?.remove((item) => item.id === 1);
     expect(author.books?.count).toEqual(2);
 });
 
